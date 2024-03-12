@@ -22,6 +22,26 @@ enum Role {
   UNASSIGNED
 }
 
+enum Status {
+  DRAFT
+  SUBMITTED
+  APPROVED
+}
+
+enum Rate {
+  HOUR
+  DAY
+  WEEK
+  MONTH
+}
+
+enum Billing {
+  FIXED_COST
+  PROJECT_HOURS
+  TASK_HOURS
+  STAFF_HOURS
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -62,10 +82,10 @@ model VerificationToken {
 }
 
 model User {
-  id            String       @id @default(cuid())
+  id            String         @id @default(cuid())
   firstName     String?
   lastName      String?
-  email         String       @unique
+  email         String         @unique
   emailVerified DateTime?
   password      String?
   image         String?
@@ -73,6 +93,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   client        ClientUser[]
+  ProjectUsers  ProjectUsers[]
+  TimeReport    TimeReport[]
 }
 
 model Client {
@@ -106,7 +128,20 @@ model ClientUser {
 model Project {
   id              String            @id @default(cuid())
   name            String
+  code            String?
+  customer        Customer          @relation(fields: [customerId], references: [id])
+  customerId      String
   ProjectActivity ProjectActivity[]
+  billingMethod   Billing
+  currency        String
+  ProjectUsers    ProjectUsers[]
+  TimeReport      TimeReport[]
+}
+
+model Customer {
+  id      String    @id @default(cuid())
+  name    String
+  Project Project[]
 }
 
 model Activity {
@@ -114,6 +149,7 @@ model Activity {
   name            String
   chargable       Boolean
   ProjectActivity ProjectActivity[]
+  TimeReport      TimeReport[]
 }
 
 model ProjectActivity {
@@ -123,13 +159,31 @@ model ProjectActivity {
   activity     Activity    @relation(fields: [activityId], references: [id])
   activityId   String
   chargable    Boolean
-  // TimeReport   TimeReport? @relation(fields: [timeReportId], references: [id])
-  // timeReportId String?
+  timeReportId String?
+  TimeReport   TimeReport? @relation(fields: [timeReportId], references: [id])
+}
+
+model ProjectUsers {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  rate      Int
+  rateBy    Rate
 }
 
 model TimeReport {
   id              String            @id @default(cuid())
   date            DateTime
   hours           Int
-  // ProjectActivity ProjectActivity[]
+  notes           String
+  status          Status
+  project         Project           @relation(fields: [projectId], references: [id])
+  activity        Activity          @relation(fields: [activityId], references: [id])
+  user            User              @relation(fields: [userId], references: [id])
+  userId          String
+  ProjectActivity ProjectActivity[]
+  projectId       String
+  activityId      String
 }

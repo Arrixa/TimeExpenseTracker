@@ -145,7 +145,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, setIsEditMode, setF
                 <FormItem className="flex flex-col items-left mt-4">
                   <Label htmlFor="email" className="w-1/2 mx-4">Email</Label>
                     <FormControl className="">
-                      <Input type="email" id="email" placeholder='Enter your first email' {...field} />
+                      <Input type="email" id="email" placeholder='Enter your email' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

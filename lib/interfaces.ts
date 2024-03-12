@@ -251,6 +251,12 @@ export interface EmailConfig {
   ) => Awaitable<void>
 }
 
+export interface DatePickerProps {
+  label: string;
+  selectedDate?: Date;
+  onSelectDate: (date: Date) => void;
+}
+
 export interface ClientForm {
   domain: string;
   id?: string;
