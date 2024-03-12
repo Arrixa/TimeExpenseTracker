@@ -38,9 +38,9 @@ const CompanyInfo: React.FC<ClientForm & { formData?: ClientForm, setIsEditMode:
   };
 
   const logo = client?.logo;
-  const cloudinaryLogoDomain = client?.domain;
+  const domain = client?.domain;
   const defaultLogo = 'https://res.cloudinary.com/dsbvy1t2i/image/upload/v1707912829/DefaultLogo.png';
-  const logoCloudUrl = `https://res.cloudinary.com/dsbvy1t2i/image/upload/v1707912829/${cloudinaryLogoDomain}.png`;
+  const logoCloudUrl = `https://res.cloudinary.com/dsbvy1t2i/image/upload/v1707912829/${domain}.png`;
   const [logoUrl, setLogoUrl] = useState<string>(defaultLogo);
 
 
@@ -55,6 +55,7 @@ const CompanyInfo: React.FC<ClientForm & { formData?: ClientForm, setIsEditMode:
   useEffect(() => {
     console.log("Logo URL updated:", logoUrl);
   }, [logoUrl]);
+
 
   // FTM-2 / FTM-20 11. Display client information
 
@@ -73,7 +74,7 @@ const CompanyInfo: React.FC<ClientForm & { formData?: ClientForm, setIsEditMode:
         </CardContent>
         <div className='flex flex-col md:flex-row justify-between'>
           <CardHeader>
-            <CardTitle>{client?.companyName ? client?.companyName : client?.domain}</CardTitle>
+            <CardTitle>{client?.companyName ? client?.companyName : capitaliseFirstLetter(domain)}</CardTitle>
           </CardHeader>
           <CardFooter>
             <Button

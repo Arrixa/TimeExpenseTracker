@@ -18,9 +18,9 @@ const UserCard: React.FC<UserCardProps> = ({ session, isMenuOpen }) => {
   const router = useRouter();
 
   const cloudinaryBaseURL = 'https://res.cloudinary.com/dsbvy1t2i/image/upload/';
-  const cloudinaryImageId = session?.user.id; 
-  const imageUrl = `${cloudinaryBaseURL}v1707912829/${cloudinaryImageId}.png`;
   const defaultImg = 'DefaultProfileImg';
+  const cloudinaryImageId = session?.user.image ? session?.user.id : defaultImg; 
+  const imageUrl = `${cloudinaryBaseURL}v1707912829/${cloudinaryImageId}.png`;
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' });
@@ -40,7 +40,7 @@ const UserCard: React.FC<UserCardProps> = ({ session, isMenuOpen }) => {
             <Popover>
               <PopoverTrigger asChild>
                 <button className="">
-                  <CldImage alt='profile image' src={user?.image} width={50} height={50} className='rounded-full' />
+                  <CldImage alt='profile image' src={imageUrl} width={50} height={50} className='rounded-full' />
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-fit">
@@ -64,7 +64,7 @@ const UserCard: React.FC<UserCardProps> = ({ session, isMenuOpen }) => {
           <Popover>
             <PopoverTrigger asChild>
               <button className="mx-2">
-                <CldImage alt='profile image' src={user?.image} width={50} height={50} className='rounded-full' />
+                <CldImage alt='profile image' src={imageUrl} width={50} height={50} className='rounded-full' />
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-fit">

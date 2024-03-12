@@ -130,7 +130,7 @@ const SignUpForm = () => {
       <div className="flex flex-col mx-auto w-full my-2">
         <Label className='text-left ml-2 p-2'>Email</Label>
         <Input className='text-foreground' disabled placeholder={session?.user.email} />
-    </div>
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='w-full'>
           <div className='space-y-2 md:w-full'>

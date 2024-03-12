@@ -252,7 +252,7 @@ export interface EmailConfig {
 }
 
 export interface ClientForm {
-  domain?: string;
+  domain: string;
   id?: string;
   companyName?: string;
   logo?: string;

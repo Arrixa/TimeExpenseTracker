@@ -18,7 +18,7 @@ const SignupPage = () => {
           className="object-cover"
         />
       </section>
-      <section className="flex flex-col justify-center items-center w-full mx-auto ">
+      <section className="flex flex-col justify-center items-center w-full ">
         <div className="py-5">
           <h2 className="text-3xl font-bold text-center py-10">Welcome</h2>
           <div className="flex items-center justify-center">
@@ -28,9 +28,7 @@ const SignupPage = () => {
             </span>
             <h3 className="text-lg align-text-bottom">&nbsp; profile.</h3></div>
           </div>
-        <div className="w-full md:w-auto"> 
           <SignUpForm />
-        </div>
       </section>
     </main>
   );

@@ -43,7 +43,7 @@ const EmployeeProfileTable: React.FC<{ formData: FormData, setIsEditMode: React.
         <CardContent>
           <div className='flex justify-start items-start'>
             <div className=''>
-              <CldImage alt='profile image' src={user?.image} width={100} height={100} className='rounded-full' />
+              <CldImage alt='profile image' src={imageUrl} width={50} height={50} className='rounded-full' />
             </div>
             <div className='mb-2'>
               <AddPhoto setImgUrl={setImgUrl} />
