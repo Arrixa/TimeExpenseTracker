@@ -4,18 +4,10 @@ import IconRenderer from './Icons';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import TooltipIconRenderer from './TooltipIcons';
 import { TooltipProvider } from '@/app/components/ui/tooltip';
+import { sidebarItems } from '@/lib/sidebarItemsConst';
 
 // FTM-2 / FTM-20 20. Sidebar items
 const SidebarItemRenderer = ({ userRoles, isMenuOpen }: { userRoles: string[]; isMenuOpen: boolean }) => {
-  const sidebarItems = [
-    { role: 'EMPLOYEE', label: 'Profile', href: '/dashboard/employee-profile' },
-    { role: 'ADMIN', label: 'Admin dashboard', href: '/dashboard/admin' },
-    { role: 'EMPLOYEE', label: 'Recruitment', href: '#' },
-    { role: 'EMPLOYEE', label: 'Inbox', href: '#' },
-    { role: 'ADMIN', label: 'Users', href: '#' },
-    { role: 'EMPLOYEE', label: 'Preferences', href: '#' },
-    { role: 'EMPLOYEE', label: 'Settings', href: '#' },
-  ];
 
   let uniqueRoles: string[] = [];
   let filteredSidebarItems;

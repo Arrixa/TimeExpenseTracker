@@ -6,6 +6,9 @@ import {
   Settings2,
   User,
   Users,
+  CalendarClock,
+  Timer,
+  WalletCards,
 } from "lucide-react";
 import {
   Tooltip,
@@ -18,27 +21,35 @@ import {
 
 const TooltipIconRenderer = ({ iconName }: { iconName: string }) => {
   switch (iconName) {
-    case 'Profile':
-      return (
-        <Tooltip>
-          <TooltipTrigger className="mx-auto"><User className="h-5 w-5 mx-auto hover:scale-125" /></TooltipTrigger>
-          <TooltipContent><p>Profile</p></TooltipContent>
-        </Tooltip>
-      );
-
-    case 'Admin dashboard':
+    case 'Admin':
       return (
         <Tooltip>
           <TooltipTrigger className="mx-auto"><LayoutDashboard className="h-5 w-5 mx-auto hover:scale-125" /></TooltipTrigger>
-          <TooltipContent><p>Admin dashboard</p></TooltipContent>
+          <TooltipContent><p>Admin</p></TooltipContent>
         </Tooltip>
       );
 
-    case 'Recruitment':
+    case 'Time tracker':
+      return (
+        <Tooltip>
+          <TooltipTrigger className="mx-auto"><Timer className="h-5 w-5 mx-auto hover:scale-125" /></TooltipTrigger>
+          <TooltipContent><p>Time tracker</p></TooltipContent>
+        </Tooltip>
+      );
+
+      case 'Time sheet':
+        return (
+          <Tooltip>
+            <TooltipTrigger className="mx-auto"><CalendarClock className="h-5 w-5 mx-auto hover:scale-125" /></TooltipTrigger>
+            <TooltipContent><p>Time sheet</p></TooltipContent>
+          </Tooltip>
+        );
+        
+    case 'Expense tracker':
       return (
         <Tooltip>
           <TooltipTrigger className="mx-auto"><Briefcase className="h-5 w-5 mx-auto hover:scale-125" /></TooltipTrigger>
-          <TooltipContent><p>Recruitment</p></TooltipContent>
+          <TooltipContent><p>Expense tracker</p></TooltipContent>
         </Tooltip>
       );
 
