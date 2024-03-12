@@ -1,7 +1,7 @@
 // schema.prisma
 
 generator client {
-  provider = "prisma-client-js" 
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-arm64-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
 }
 
@@ -42,64 +42,94 @@ model Account {
 }
 
 model Session {
-  id                String       @id @default(cuid())
-  sessionToken      String       @unique
-  userId            String
-  clientId          String
-  clientUserId      String
-  expires           DateTime
-  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  client            Client       @relation(fields: [clientId], references: [id])
-  clientUser        ClientUser   @relation(fields: [clientUserId], references: [id])
+  id           String     @id @default(cuid())
+  sessionToken String     @unique
+  userId       String
+  clientId     String
+  clientUserId String
+  expires      DateTime
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client       Client     @relation(fields: [clientId], references: [id])
+  clientUser   ClientUser @relation(fields: [clientUserId], references: [id])
 }
 
-
 model VerificationToken {
-  identifier        String
-  token             String      @unique
-  expires           DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
   @@unique([identifier, token])
 }
+
 model User {
-  id                String      @id @default(cuid())
-  firstName         String?
-  lastName          String?
-  email             String      @unique
-  emailVerified     DateTime?
-  password          String?
-  image             String?
-  userDomain        String?
-  accounts          Account[]
-  sessions          Session[]
-  client            ClientUser[]
+  id            String       @id @default(cuid())
+  firstName     String?
+  lastName      String?
+  email         String       @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  userDomain    String?
+  accounts      Account[]
+  sessions      Session[]
+  client        ClientUser[]
 }
 
-model Client {  
-  id                String    @id @default(cuid())
-  domain            String    @unique
-  companyName       String?
-  logo              String? 
-  website           String?
-  description       String?
-  countryCode       String?
-  phoneNumber       String?
-  streetNo          String?
-  streetAddress     String?
-  province          String?
-  zipCode           String?
-  country           String?
-  user              ClientUser[]
-  sessions          Session[]
-} 
+model Client {
+  id            String       @id @default(cuid())
+  domain        String       @unique
+  companyName   String?
+  logo          String?
+  website       String?
+  description   String?
+  countryCode   String?
+  phoneNumber   String?
+  streetNo      String?
+  streetAddress String?
+  province      String?
+  zipCode       String?
+  country       String?
+  user          ClientUser[]
+  sessions      Session[]
+}
 
 model ClientUser {
-  id                String @id @default(cuid())
-  client            Client @relation(fields: [clientId], references: [id])
-  clientId          String 
-  user              User @relation(fields: [userId], references: [id])
-  userId            String
-  role              Role[]
-  sessions          Session[]
+  id       String    @id @default(cuid())
+  client   Client    @relation(fields: [clientId], references: [id])
+  clientId String
+  user     User      @relation(fields: [userId], references: [id])
+  userId   String
+  role     Role[]
+  sessions Session[]
 }
 
+model Project {
+  id              String            @id @default(cuid())
+  name            String
+  ProjectActivity ProjectActivity[]
+}
+
+model Activity {
+  id              String            @id @default(cuid())
+  name            String
+  chargable       Boolean
+  ProjectActivity ProjectActivity[]
+}
+
+model ProjectActivity {
+  id           String      @id @default(cuid())
+  project      Project     @relation(fields: [projectId], references: [id])
+  projectId    String
+  activity     Activity    @relation(fields: [activityId], references: [id])
+  activityId   String
+  chargable    Boolean
+  // TimeReport   TimeReport? @relation(fields: [timeReportId], references: [id])
+  // timeReportId String?
+}
+
+model TimeReport {
+  id              String            @id @default(cuid())
+  date            DateTime
+  hours           Int
+  // ProjectActivity ProjectActivity[]
+}
