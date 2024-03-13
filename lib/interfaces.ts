@@ -311,5 +311,25 @@ export interface SessionProps {
     logo: string;
 }
 
-// { formData: FormData; session: { firstName: string; lastName: string; email: string; image: string; userDomain: string; role: string[]; userId: string; clientId: string; user: { id: string; firstName: string; lastName: string; email: string; image: string; userDomain: string; }; clientUser: { ...; }; }; }
+export interface HourEntry {
+  startTime: string;
+  endTime: string;
+  notes: string;
+  type: string;
+};
+
+export interface DaySchedule {
+  day: string;
+  date: string;
+  hours: HourEntry[];
+};
+
+export interface WeekNavigatorProps {
+    handlePreviousWeek: () => void;
+    handleNextWeek: () => void;
+    handleCurrentWeek: () => void;
+    startDate: string;
+    endDate: string;
+};
+
 
