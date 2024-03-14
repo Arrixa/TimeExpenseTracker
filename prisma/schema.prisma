@@ -149,7 +149,7 @@ model Customer {
 model Activity {
   id              String            @id @default(cuid())
   name            String
-  chargable       Boolean
+  chargable       Boolean           @default(true)
   ProjectActivity ProjectActivity[]
   TimeReport      TimeReport[]
 }

@@ -13,7 +13,6 @@ import { Label } from '@/app/components/ui/label';
 import { CurrencySelect } from '@/app/components/common/CurrencySelect';
 import { DateSelect } from '@/app/components/common/DateSelect';
 import { Switch } from '@/app/components/ui/switch';
-import { FancyMultiSelect } from '@/app/components/common/MultiSelect';
 import ActivitySelect from './ActivitySelect';
 
 // Define your form schema here
@@ -26,24 +25,23 @@ const FormSchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   // users: z.string().optional(),
-  activity: z.string().optional(),
+  activity: z.array(z.string()).optional(),
   billable: z.boolean()
 });
 
 const ProjectForm = () => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
-    // Define default values for your form fields
     defaultValues: {
       name: '',
       code: '',
       customer: '',
-      billingMethod: '', // Default value as an example
+      billingMethod: '',
       currency: '',
       startDate: '',
       endDate: '',
       // users: [''],
-      activity: '',
+      activity: [''],
       billable: true,
     },
   });
@@ -64,11 +62,43 @@ const ProjectForm = () => {
   // };
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    console.log('Form submitted:', data);
+    console.log(selectedActivities, selectedCurrency, startDate, endDate)
+    console.log("Save job function called");
     try {
-      // Make an API request with the form data
-      toast({
-        description: "Project created successfully.",
-      });
+      const response = await fetch('/api/project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: data.name,
+          code: data.code,
+          customer: data.customer,
+          billingMethod: data.billingMethod,
+          currency: selectedCurrency,
+          startDate: startDate,
+          endDate: endDate,
+          // users: [''],
+          activity: selectedActivities,
+          billable: data.billable,
+        })
+      })
+        if (response.ok) {
+          toast({
+            description: "The project saved successfully.",
+          })
+          const res = await response.json();
+          // setFormData(res);
+          console.log(res, 'response data from form save');
+        } else {
+          toast({
+            variant: "destructive",
+            title: "The project save failed.",
+            description: "Please try again.",
+          })
+          console.error("Save failed");
+        }
     } catch (error) {
       toast({
         variant: "destructive",
@@ -119,22 +149,13 @@ const ProjectForm = () => {
               name='customer'
               render={({ field }) => (
                 <FormItem className="flex flex-col items-left mt-4">
-                  <Label className=" mx-4" htmlFor="code">Customer</Label>
-                  <FormControl className="">
-                    <Select>
-                      <SelectTrigger className="w-full border-border mr-2">
-                          <SelectValue placeholder="Select customer" />
-                      </SelectTrigger>
-                      <SelectContent>
-                          <SelectGroup>
-                              <SelectItem value="customer1">Customer 1</SelectItem>
-                              <SelectItem value="customer2">Customer 2</SelectItem>
-                          </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <Label className="w-1/2 mx-4" htmlFor="customer">Customer name</Label>
+                <FormControl className="">
+                  <Input type="text" id="customer" placeholder='Enter a customer name' 
+                    {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
               )}
             />
         <div className='flex flex-col md:flex-row w-full justify-between'>
@@ -231,7 +252,7 @@ const ProjectForm = () => {
               )}
             />
           </div>
-          <div>
+          <div className='mb-2'>
             <FormField
               control={form.control}
               name='activity'
@@ -252,14 +273,7 @@ const ProjectForm = () => {
               )}
             />
           </div>
-
-          {/* User Assignment Section */}
-          {/* Loop through projectUsers and render User Rows */}
-          {/* {projectUsers.map((user, index) => (
-            // ... render user row with information and remove button
-          ))}
-          <Button onClick={addProjectUser}>Add User</Button>
-          <Button type='submit'>Create Project</Button> */}
+          <Button type='submit' >Create Project</Button>
         </form>
       </Form>
     </Card>
@@ -267,3 +281,16 @@ const ProjectForm = () => {
 };
 
 export default ProjectForm;
+
+          {/* User Assignment Section */}
+          {/* Loop through projectUsers and render User Rows */}
+          {/* {projectUsers.map((user, index) => (
+            // ... render user row with information and remove button
+          ))}
+          <Button onClick={addProjectUser}>Add User</Button>
+        {/* <div className="flex flex-col md:flex-row-reverse justify-between">
+          <Button className='my-4 text-md' type='submit'>
+            Save
+          </Button>
+          <Button className='my-4 text-md' variant='flairnowOutline'>Cancel</Button>  
+        </div> */}

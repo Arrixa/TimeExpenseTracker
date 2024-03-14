@@ -9,7 +9,11 @@ export async function POST(req: Request) {
     console.log("reqBody", reqBody)
     const session = await getServerSession(authOptions);
     const userId = session?.clientUser?.userId
-    const timeReport = 
+    const timeReport = await prisma.timeReport.create({ 
+      data: { 
+        ...reqBody
+      } 
+    });
     return NextResponse.json({ timeReport, message: "Time report created successfully"}, { status: 202 })
   } catch (error) {
     console.error("Error during creating time report:", error);

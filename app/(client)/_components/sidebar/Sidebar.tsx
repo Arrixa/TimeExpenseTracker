@@ -66,7 +66,7 @@ const SidebarComp: React.FC<SidebarCompProps> = ({ userRoles, session }) => {
 
   return (
     <div className='bg-brand text-foreground relative h-full'>
-      <div className={`flex flex-col h-full ${isMenuOpen ? 'sticky' : ''}`} style={{ left: isMenuOpen ? '0' : '-200px', top: '0', bottom: '0', height: '100vh' }}>
+      <div className={'flex flex-col h-full sticky'} style={{ left: isMenuOpen ? '0' : '-200px', top: '0', bottom: '0', height: '100vh' }}>
         <Link href='/'>
           <CldImage alt={`${user?.userDomain} logo`} src={logoUrl} width={40} height={40} className={`object-cover mt-4 ${isMenuOpen ? 'ml-6' : 'mx-auto'}`} />         
         </Link>
