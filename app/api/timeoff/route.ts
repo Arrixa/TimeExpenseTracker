@@ -2,13 +2,11 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/utils/authOptions";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
- 
-// FTM-2 /FTM-20 15. Update client information
 
 export async function POST(req: Request) {
   try {
     const reqBody = await req.json();
-    // console.log("reqBody", reqBody)
+
     const session = await getServerSession(authOptions);
     const clientId = session?.clientUser?.clientId
     const client = await prisma.client.findUnique({

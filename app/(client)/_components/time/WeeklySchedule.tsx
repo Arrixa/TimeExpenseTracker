@@ -30,6 +30,28 @@ import { removeHourEntry } from '@/lib/time/removeHourEntry';
 import TotalHours from './TotalHours';
 import WeekNavigator from './WeekNavigator';
  
+
+type HourEntry = {
+    startTime: string;
+    endTime: string;
+    notes: string;
+    project: string;
+    activity: string;
+    // type: string;
+};
+ 
+type DaySchedule = {
+    day: string;
+    date: string;
+    hours: HourEntry[];
+};
+
+// const initialSchedule: DaySchedule[] = [
+//     { day: 'Monday', date: 'Mar 11', hours: [{ startTime: '09:00', endTime: '17:00', notes: '', project: "Select project", activity: 'Select activity' }] },
+//     { day: 'Tuesday', date: 'Mar 12', hours: [{ startTime: '09:00', endTime: '17:00', notes: '', project: "Select project", activity: 'Select activity' }] },
+//     { day: 'Wednesday', date: 'Mar 13', hours: [{ startTime: '09:00', endTime: '17:00', notes: '', project: "Select project", activity: 'Select activity' }] },
+// ];
+
 const initialSchedule: DaySchedule[] = [];
  
  

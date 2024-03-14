@@ -8,6 +8,7 @@ const LoadingPage = () => {
       <CardDescription className="text-lg text-center">Please wait while the content is loading.</CardDescription>
       <CardContent>
         <Skeleton className="w-[200px] h-[40px] rounded-full my-10" />
+        <Skeleton className="w-[150px] h-[30px] rounded-full my-10" />
       </CardContent>
     </Card>
   );

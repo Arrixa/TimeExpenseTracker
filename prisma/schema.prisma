@@ -95,6 +95,8 @@ model User {
   client        ClientUser[]
   ProjectUsers  ProjectUsers[]
   TimeReport    TimeReport[]
+  LeaveRequestType LeaveRequestType[]
+  LeaveRequest LeaveRequest[]
 }
 
 model Client {
@@ -197,4 +199,33 @@ model TimeReport {
   projectId       String
   activityId      String
   comment         String?
+}
+
+//added for leave Request
+
+model LeaveRequestType {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy String
+
+  user         User           @relation(fields: [updatedBy], references: [id])
+  
+  LeaveRequest LeaveRequest[]
+}
+
+model LeaveRequest {
+  id               String           @id @default(cuid())
+  userId           String
+  user             User             @relation(fields: [userId], references: [id])
+  date             String
+  leaveType        String
+  leaveRequestType LeaveRequestType @relation(fields: [leaveType], references: [id])
+  status           String //pending, approved, rejected
+  notes            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([userId, date])
 }
