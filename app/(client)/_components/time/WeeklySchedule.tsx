@@ -16,7 +16,7 @@ type DaySchedule = {
     date: string;
     hours: HourEntry[];
 };
- 
+
 const initialSchedule: DaySchedule[] = [
     { day: 'Monday', date: 'Mar 11', hours: [{ startTime: '09:00', endTime: '17:00', notes: '', project: "Select project", activity: 'Select activity' }] },
     { day: 'Tuesday', date: 'Mar 12', hours: [{ startTime: '09:00', endTime: '17:00', notes: '', project: "Select project", activity: 'Select activity' }] },

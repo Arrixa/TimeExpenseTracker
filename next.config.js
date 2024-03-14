@@ -36,4 +36,11 @@ module.exports = {
 
     return config;
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        "opulent-space-tribble-jjjpqw56px4p2qr7v-3000.app.github.dev/",
+      ]
+    }
+  }
 };
