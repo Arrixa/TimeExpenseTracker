@@ -7,6 +7,7 @@ import {
     IoAddCircleOutline,
     IoCalendarClearOutline
 } from "react-icons/io5";
+import { FaRegNoteSticky } from "react-icons/fa6";
 
 import {
     Sheet,
@@ -114,9 +115,10 @@ const CustomCalendar: React.FC = () => {
                         </SheetHeader>
                     </SheetContent>
                 </Sheet>
+                {/* 
                 <Sheet>
                     <SheetTrigger className='flex space-x-2 items-center bg-primary text-white px-4 rounded-lg mb-2'>
-                        {/* <IoCalendarClearOutline /> */}
+                        <FaRegNoteSticky />
                         <span className='text-sm'>Add Leave Type</span>
                     </SheetTrigger>
                     <SheetContent>
@@ -128,6 +130,7 @@ const CustomCalendar: React.FC = () => {
                         </SheetHeader>
                     </SheetContent>
                 </Sheet>
+            */}
             </div>
 
             <div className="grid grid-cols-8 text-center border-collapse">

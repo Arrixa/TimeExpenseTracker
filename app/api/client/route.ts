@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const reqBody = await req.json();
-    console.log("reqBody", reqBody)
+    // console.log("reqBody", reqBody)
     const session = await getServerSession(authOptions);
     const clientId = session?.clientUser?.clientId
     const client = await prisma.client.findUnique({

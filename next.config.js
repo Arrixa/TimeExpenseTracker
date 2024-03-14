@@ -7,6 +7,14 @@ const nextConfig = {}
 // module.exports = nextConfig
 
 module.exports = {
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        "localhost:3000",
+        "opulent-space-tribble-jjjpqw56px4p2qr7v-3000.app.github.dev/",
+      ]
+    }
+  },
   images: {
     remotePatterns: [
       {
@@ -36,11 +44,5 @@ module.exports = {
 
     return config;
   },
-  experimental: {
-    serverActions: {
-      allowedOrigins: [
-        "opulent-space-tribble-jjjpqw56px4p2qr7v-3000.app.github.dev/",
-      ]
-    }
-  }
+  
 };
