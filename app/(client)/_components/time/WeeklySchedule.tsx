@@ -207,7 +207,7 @@ const WeeklySchedule = () => {
                                     </div>
                                     <div className="flex flex-row">
                                         <div className="flex-1">
-                                            <Input className='md:w-96 mr-2'
+                                            <Input className='md:w-96'
                                                 placeholder="Notes"
                                             />
                                         </div>

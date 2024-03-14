@@ -183,6 +183,7 @@ export interface Country {
   name: string;
   unicodeFlag: string;
   dialCode: string;
+  currency: string;
 }
 
 export interface CommandInputProps {

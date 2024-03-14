@@ -1,5 +1,6 @@
 export const sidebarItems = [
   { role: "ADMIN", label: "Admin", href: "/dashboard/admin" },
+  { role: "EMPLOYEE", label: "Project", href: "/dashboard/project" },
   { role: "EMPLOYEE", label: "Time tracker", href: "/dashboard/time" },
   { role: "EMPLOYEE", label: "Time report", href: "/dashboard/time-report" },
   { role: "EMPLOYEE", label: "Expense tracker", href: "/dashboard/expense" },

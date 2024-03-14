@@ -9,6 +9,7 @@ import {
   CalendarClock,
   Timer,
   WalletCards,
+  FileBox,
 } from "lucide-react";
 import {
   Tooltip,
@@ -32,6 +33,17 @@ const TooltipIconRenderer = ({ iconName }: { iconName: string }) => {
           </TooltipContent>
         </Tooltip>
       );
+      case "Project":
+        return (
+          <Tooltip>
+            <TooltipTrigger className="mx-auto">
+              <FileBox className="h-5 w-5 mx-auto hover:scale-125" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Project</p>
+            </TooltipContent>
+          </Tooltip>
+        );
 
     case "Time tracker":
       return (
