@@ -9,6 +9,7 @@ import {
   CalendarClock,
   Timer,
   WalletCards,
+  FileBox,
 } from "lucide-react";
 
 // FTM-2 / FTM-20 21. Sidebar icons
@@ -17,6 +18,8 @@ const IconRenderer = ({ iconName }: { iconName: string }) => {
   switch (iconName) {
     case "Admin":
       return <LayoutDashboard className="h-5 w-5 ml-4" />;
+    case "Project":
+      return <FileBox className="h-5 w-5 ml-4" />;
     case "Time tracker":
       return <Timer className="h-5 w-5 ml-4" />;
     case "Time report":

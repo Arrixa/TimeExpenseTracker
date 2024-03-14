@@ -23,9 +23,9 @@ enum Role {
 }
 
 enum Status {
-  DRAFT
   SUBMITTED
   APPROVED
+  REJECTED
 }
 
 enum Rate {
@@ -138,6 +138,8 @@ model Project {
   currency        String
   ProjectUsers    ProjectUsers[]
   TimeReport      TimeReport[]
+  startDate       DateTime?
+  endDate         DateTime?
 }
 
 model Customer {
@@ -149,7 +151,7 @@ model Customer {
 model Activity {
   id              String            @id @default(cuid())
   name            String
-  chargable       Boolean
+  chargable       Boolean           @default(true)
   ProjectActivity ProjectActivity[]
   TimeReport      TimeReport[]
 }
@@ -166,28 +168,37 @@ model ProjectActivity {
 }
 
 model ProjectUsers {
-  id        String  @id @default(cuid())
-  project   Project @relation(fields: [projectId], references: [id])
-  projectId String
-  user      User    @relation(fields: [userId], references: [id])
-  userId    String
-  rate      Int
-  rateBy    Rate
+  id         String       @id @default(cuid())
+  project    Project      @relation(fields: [projectId], references: [id])
+  projectId  String
+  user       User         @relation(fields: [userId], references: [id])
+  userId     String
+  rate       Int
+  rateBy     Rate
+  startDate  DateTime?
+  endDate    DateTime?
+  approver   Boolean?
+  reviewer   Boolean?
+  TimeReport TimeReport[]
 }
 
 model TimeReport {
   id              String            @id @default(cuid())
-  date            DateTime
+  startTime       DateTime
+  endTime         DateTime
   hours           Int
-  notes           String
+  notes           String?
   status          Status
   project         Project           @relation(fields: [projectId], references: [id])
   activity        Activity          @relation(fields: [activityId], references: [id])
   user            User              @relation(fields: [userId], references: [id])
   userId          String
+  approver        ProjectUsers      @relation(fields: [approverId], references: [id])
+  approverId      String
   ProjectActivity ProjectActivity[]
   projectId       String
   activityId      String
+  comment         String?
 }
 
 //added for leave Request

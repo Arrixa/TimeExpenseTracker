@@ -16,7 +16,7 @@ export function DateSelect({ label, selectedDate, onSelectDate }: DatePickerProp
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={"input"}
+          variant="input"
           className={cn(
             "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground"

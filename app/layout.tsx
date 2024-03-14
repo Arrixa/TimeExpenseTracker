@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">  
       <body  className={cn(
-          "h-screen w-screen bg-background font-sans antialiased",
+          "h-screen w-screen bg-background font-sans antialiased box-border",
           fontSans.variable
         )}
         >
