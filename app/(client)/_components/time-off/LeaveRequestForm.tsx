@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useEffect, useState } from 'react'
 
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { useToast } from "@/app/components/ui/use-toast"
 import { z } from "zod";
 import { getAllLeaveTypes, addLeaveRequest } from './actions';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form'
@@ -32,7 +32,7 @@ const FormSchema = z.object({
 })
 
 export function LeaveRequestForm({ leaveDate }: LeaveRequestFormProps) {
-
+    const { toast } = useToast();
     const { register, handleSubmit, reset } = useForm<FormData>();
     const [isLoading, setIsLoading] = useState(false);
     const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
@@ -65,16 +65,25 @@ export function LeaveRequestForm({ leaveDate }: LeaveRequestFormProps) {
             const result = await addLeaveRequest(data);
 
             if (result?.error) {
-                toast.error('Leave Request Submission failed: ' + result?.error);
+                toast({
+                    description: 'Leave Request Submission failed: ' + result?.error,
+                    variant: "destructive",
+                  })
                 console.log(result?.error);
             } else {
                 // Handle success, maybe set a success toast here
-                toast.success('Leave Request Submitted Successful');
+                toast({
+                    description: 'Leave Request Submitted Successful',
+                    variant: "default",
+                  })
             }
 
         } catch (error) {
             // Handle error, maybe set an error toast here
-            toast.error('Leave Request Submission failed: ' + error)
+            toast({
+                description: 'Leave Request Submission failed: ' + error,
+                variant: "default",
+              })
             console.log("Catch Error:" + error);
         } finally {
             setIsLoading(false) // Disable loading indicator regardless of outcome

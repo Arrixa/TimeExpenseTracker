@@ -159,7 +159,7 @@ const CustomCalendar: React.FC = () => {
                                     } 
                                     `}
                             >
-                                <Button variant={`${calendarDay.isToday ? 'default' : 'ghost'}`} size={'icon'} disabled={calendarDay.currentMonth ? false : true}>
+                                <Button variant={`${calendarDay.isToday ? 'flairnow' : 'ghost'}`} size={'icon'} disabled={calendarDay.currentMonth ? false : true}>
                                     {calendarDay.day}
                                 </Button>
                             </div>
