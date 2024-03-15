@@ -24,9 +24,6 @@ const FormSchema = z.object({
   currency: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
-  // users: z.string().optional(),
-  activity: z.array(z.string()).optional(),
-  billable: z.boolean()
 });
 
 const ProjectForm = () => {
@@ -40,30 +37,18 @@ const ProjectForm = () => {
       currency: '',
       startDate: '',
       endDate: '',
-      // users: [''],
-      activity: [''],
-      billable: true,
     },
   });
 
   const { toast } = useToast();
-  const [projectUsers, setProjectUsers] = useState([]);
   const [selectedCurrency, setSelectedCurrency] = useState<string>(''); 
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
-  
-  // const addProjectUser = () => {
-  //   // Logic to add a new user row
-  // };
 
-  // const removeProjectUser = (index) => {
-  //   // Logic to remove user row by index
-  // };
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     console.log('Form submitted:', data);
-    console.log(selectedActivities, selectedCurrency, startDate, endDate)
+    console.log(selectedCurrency, startDate, endDate)
     console.log("Save job function called");
     try {
       const response = await fetch('/api/project', {
@@ -80,8 +65,8 @@ const ProjectForm = () => {
           startDate: startDate,
           endDate: endDate,
           // users: [''],
-          activity: selectedActivities,
-          billable: data.billable,
+          // activity: selectedActivities,
+          // billable: data.billable,
         })
       })
         if (response.ok) {
@@ -195,6 +180,7 @@ const ProjectForm = () => {
             />
           </div>
           </div>
+          <div  className='flex flex-col md:flex-row w-full justify-between'>
             <FormField
               control={form.control}
               name='billingMethod'
@@ -220,8 +206,7 @@ const ProjectForm = () => {
                 </FormItem>
               )}
             />
-          <div  className='flex flex-col md:flex-row w-full justify-between'>
-             <FormField
+            <FormField
               control={form.control}
               name='currency'
               render={({ field }) => (
@@ -233,8 +218,30 @@ const ProjectForm = () => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
-            <FormField
+            />          
+          </div>
+          <Button type='submit'>Create Project</Button>
+        </form>
+      </Form>
+    </Card>
+  );
+};
+
+export default ProjectForm;
+
+          {/* User Assignment Section */}
+          {/* Loop through projectUsers and render User Rows */}
+          {/* {projectUsers.map((user, index) => (
+            // ... render user row with information and remove button
+          ))}
+          <Button onClick={addProjectUser}>Add User</Button>
+        {/* <div className="flex flex-col md:flex-row-reverse justify-between">
+          <Button className='my-4 text-md' type='submit'>
+            Save
+          </Button>
+          <Button className='my-4 text-md' variant='flairnowOutline'>Cancel</Button>  
+        </div> 
+       <FormField
               control={form.control}
               name='billable'
               render={({ field }) => (
@@ -251,8 +258,8 @@ const ProjectForm = () => {
                 </FormItem>
               )}
             />
-          </div>
-          <div className='mb-2'>
+      
+                <div className='mb-2'>
             <FormField
               control={form.control}
               name='activity'
@@ -273,24 +280,5 @@ const ProjectForm = () => {
               )}
             />
           </div>
-          <Button type='submit' >Create Project</Button>
-        </form>
-      </Form>
-    </Card>
-  );
-};
-
-export default ProjectForm;
-
-          {/* User Assignment Section */}
-          {/* Loop through projectUsers and render User Rows */}
-          {/* {projectUsers.map((user, index) => (
-            // ... render user row with information and remove button
-          ))}
-          <Button onClick={addProjectUser}>Add User</Button>
-        {/* <div className="flex flex-col md:flex-row-reverse justify-between">
-          <Button className='my-4 text-md' type='submit'>
-            Save
-          </Button>
-          <Button className='my-4 text-md' variant='flairnowOutline'>Cancel</Button>  
-        </div> */}
+      
+      */}

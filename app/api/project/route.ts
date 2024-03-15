@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const reqBody = await req.json();
     console.log(reqBody, 'req json data in project route')
-    const { customer, billable, activities, ...projectInfo } = reqBody;
+    const { customer, ...projectInfo } = reqBody;
     const session = await getServerSession(authOptions);
     const clientId = await session?.clientUser.clientId;
     const userId = await session?.user.id;

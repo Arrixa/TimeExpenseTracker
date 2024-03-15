@@ -31,20 +31,20 @@ import TotalHours from './TotalHours';
 import WeekNavigator from './WeekNavigator';
  
 
-type HourEntry = {
-    startTime: string;
-    endTime: string;
-    notes: string;
-    project: string;
-    activity: string;
-    // type: string;
-};
+// type HourEntry = {
+//     startTime: string;
+//     endTime: string;
+//     notes: string;
+//     project: string;
+//     activity: string;
+//     // type: string;
+// };
  
-type DaySchedule = {
-    day: string;
-    date: string;
-    hours: HourEntry[];
-};
+// type DaySchedule = {
+//     day: string;
+//     date: string;
+//     hours: HourEntry[];
+// };
 
 // const initialSchedule: DaySchedule[] = [
 //     { day: 'Monday', date: 'Mar 11', hours: [{ startTime: '09:00', endTime: '17:00', notes: '', project: "Select project", activity: 'Select activity' }] },
