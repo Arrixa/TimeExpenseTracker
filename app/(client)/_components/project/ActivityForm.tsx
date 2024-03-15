@@ -18,7 +18,7 @@ const FormSchema = z.object({
   })),
 });
 
-const ActivityForm = ({ projectId }) => {
+const ActivityForm = (projectId) => {
   const { control, handleSubmit, register } = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {

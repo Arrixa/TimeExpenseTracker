@@ -56,22 +56,6 @@ async function getClientData(request: Request) {
     },
   });
 
-  console.log('Processed client data:', {
-    domain: client.domain,
-    id: client.id,
-    logo: client.logo,
-    companyName: client.companyName,
-    website: client.website,
-    description: client.description,
-    countryCode: client.countryCode,
-    phoneNumber: client.phoneNumber,
-    streetNo: client.streetNo,
-    streetAddress: client.streetAddress,
-    province: client.province,
-    zipCode: client.zipCode,
-    country: client.country,
-  });
-
   if (!client) {
     return { message: "Client does not exist" };
   }

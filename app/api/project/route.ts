@@ -31,51 +31,6 @@ export async function POST(req: Request) {
         
       });
 
-
-    // Create Activity
-    // const createActivity = await prisma.activity.create({
-    //   data: {
-    //     name: activities,
-    //   },
-    // });
-    
-    //   const createProjectActivity = await prisma.projectActivity.create({
-    //     data: {
-    //       chargable: billable,
-    //       activity: { connect: { id: createActivity.id } },
-    //       project: { connect: { id: createProject.id } },
-    //     },
-    //   })
-
-    // Iterate over the activities array and create each activity
-  //   const projectActivitiesPromises = activities.map((activityName) => {
-  //     // Create the activity if it doesn't exist and then create the project activity
-  //     return prisma.activity.upsert({
-  //       where: { name: activityName },
-  //       update: {},
-  //       create: {
-  //         name: activityName,
-  //         chargable: billable,
-  //       },
-  //     }).then(activity => {
-  //       // Create ProjectActivity linking the activity to the project
-  //       return prisma.projectActivity.create({
-  //         data: {
-  //           project: { connect: { id: createProject.id } },
-  //           activity: { connect: { id: activity.id } },
-  //           chargable: billable, 
-  //         },
-  //       });
-  //     });
-  //   });
-
-  //   // Execute all promises for creating project activities
-  //   return Promise.all(projectActivitiesPromises);
-  // });
-
-
-      // return NextResponse.json({ createProject, message: "Project created successfully"}, { status: 202 })
-    // }
     return NextResponse.json({ createProject, message: "Project & customer created successfully"}, { status: 201 })
   } catch (error) {
     console.error("Error during creating project:", error);
@@ -197,7 +152,6 @@ async function getJobsData(request: Request) {
     dueDate: job.dueDate,
     closingDate: job.closingDate,
   }));
-  console.log("processedJobs", processedJobs);
 
   return processedJobs;
 }

@@ -28,7 +28,7 @@ const FormSchema = z.object({
   endDate: z.string().optional(),
 });
 
-const ProjectForm = () => {
+const ProjectForm = (setProjectsData) => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -76,6 +76,8 @@ const ProjectForm = () => {
             description: "The project saved successfully.",
           })
           const res = await response.json();
+          const data = res.createProject;
+          setProjectsData(data)
           const id = res.createProject.id
           console.log(res);
           router.push(`/project/${id}`)
@@ -98,7 +100,7 @@ const ProjectForm = () => {
 
   // Render your form fields and buttons
   return (
-    <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
+    <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5 w-full'>
       <CardHeader><CardTitle>Create a new project</CardTitle></CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>

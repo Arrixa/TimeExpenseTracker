@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (token && user && token.email && user.email) {
-        console.log('Token email:', token.email);
+        // console.log('Token email:', token.email);
   
         const dbUser = await prisma.user.findFirst({
           where: {
@@ -69,7 +69,7 @@ export const authOptions: NextAuthOptions = {
         });
   
         const emailDomain = user?.email?.toLowerCase().split('@').pop()?.split('.')[0]
-        console.log(emailDomain)
+        // console.log(emailDomain)
         const dbClient = await prisma.client.findFirst({
           where: {
             domain: emailDomain
@@ -121,7 +121,7 @@ export const authOptions: NextAuthOptions = {
           }
         }
       }
-      console.log(token)
+      // console.log(token)
       return token;
     },
 
@@ -168,7 +168,7 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     signIn: ({ user, account, profile, isNewUser }) => {
-      console.log(`isNewUser: ${JSON.stringify(isNewUser)}`);
+      // console.log(`isNewUser: ${JSON.stringify(isNewUser)}`);
     },
   },
   // FTM-2 / FTM-21 7. Custom auth pages
