@@ -14,6 +14,8 @@ import { CurrencySelect } from '@/app/components/common/CurrencySelect';
 import { DateSelect } from '@/app/components/common/DateSelect';
 import { Switch } from '@/app/components/ui/switch';
 import ActivitySelect from './ActivitySelect';
+import { Router } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Define your form schema here
 const FormSchema = z.object({
@@ -45,11 +47,10 @@ const ProjectForm = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
+  const router = useRouter();
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    console.log('Form submitted:', data);
-    console.log(selectedCurrency, startDate, endDate)
-    console.log("Save job function called");
+    // console.log('Form submitted:', data);
     try {
       const response = await fetch('/api/project', {
         method: 'POST',
@@ -70,12 +71,14 @@ const ProjectForm = () => {
         })
       })
         if (response.ok) {
+          console.log(response)
           toast({
             description: "The project saved successfully.",
           })
           const res = await response.json();
-          // setFormData(res);
-          console.log(res, 'response data from form save');
+          const id = res.createProject.id
+          console.log(res);
+          router.push(`/project/${id}`)
         } else {
           toast({
             variant: "destructive",
@@ -105,7 +108,7 @@ const ProjectForm = () => {
               name='name'
               render={({ field }) => (
                 <FormItem className="flex flex-col items-left mt-4">
-                  <Label className="w-1/2 mx-4" htmlFor="name">Project name</Label>
+                  <Label className=" mx-4" htmlFor="name">Project name</Label>
                   <FormControl className="">
                     <Input type="text" id="name" placeholder='Enter a project name' 
                       {...field} />
@@ -119,7 +122,7 @@ const ProjectForm = () => {
               name='code'
               render={({ field }) => (
                 <FormItem className="flex flex-col items-left mt-4">
-                  <Label className="w-1/2 mx-4" htmlFor="code">Project code</Label>
+                  <Label className="mx-4" htmlFor="code">Project code</Label>
                   <FormControl className="">
                     <Input type="text" id="code" placeholder='Enter a project code' 
                       {...field} />
@@ -188,7 +191,8 @@ const ProjectForm = () => {
                 <FormItem className="flex flex-col items-left mt-4">
                   <Label className="mx-4" htmlFor="billingMethod">Billing method</Label>
                   <FormControl className="">
-                    <Select>
+                    <Select
+                    onValueChange={field.onChange} defaultValue={field.value}>
                       <SelectTrigger className="w-full border-border mr-2">
                           <SelectValue placeholder="Select billing method" />
                       </SelectTrigger>

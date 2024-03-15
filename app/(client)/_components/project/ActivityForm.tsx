@@ -8,18 +8,19 @@ import { Switch } from '@/app/components/ui/switch';
 import { Card, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form';
 import { useToast } from "@/app/components/ui/use-toast";
+import { Label } from '@/app/components/ui/label';
 
 // Define the schema for activities as part of the form
-const formSchema = z.object({
+const FormSchema = z.object({
   activities: z.array(z.object({
     name: z.string().min(1, 'Activity name is required'),
     chargeable: z.boolean(),
   })),
 });
 
-const ActivityForm = () => {
+const ActivityForm = ({ projectId }) => {
   const { control, handleSubmit, register } = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(FormSchema),
     defaultValues: {
       activities: [{ name: '', chargeable: false }],
     },
@@ -30,34 +31,72 @@ const ActivityForm = () => {
   });
   const { toast } = useToast();
 
-  const saveActivity = async (activity) => {
-    console.log('Saving activity:', activity);
-    // Implement API call to save the activity here
-  };
+  // const saveActivity = async (activity) => {
+  //   console.log('Saving activity:', activity, projectId);
+  //   // Implement API call to save the activity here
+  // };
 
-  const onSubmit = async (data) => {
-    console.log('Form submitted with data:', data);
-    data.activities.forEach(saveActivity);
-
-    // Optionally, handle the response from saveActivity for each activity
-    toast({
-      description: "Activities saved successfully.",
-    });
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    // console.log('Form submitted:', data);
+    try {
+      const response = await fetch('/api/activity', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          projectId: projectId,
+          activity: data.activities
+          
+        })
+      })
+        if (response.ok) {
+          console.log(response)
+          toast({
+            description: "The project saved successfully.",
+          })
+          const res = await response.json();
+          const data = res.ProjectActivity
+          console.log(res);
+          // router.push(`/project/${id}`)
+        } else {
+          toast({
+            variant: "destructive",
+            title: "The activity save failed.",
+            description: "Please try again.",
+          })
+          console.error("Save failed");
+        }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Activity creation failed.",
+        description: "Please try again.",
+      });
+    }
   };
 
   return (
     <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
-      <CardHeader><CardTitle>Create Activities</CardTitle></CardHeader>
+      <CardHeader><CardTitle>Add project activities</CardTitle></CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         {fields.map((field, index) => (
-          <div key={field.id} className="flex flex-col mb-4">
-            <Input {...register(`activities.${index}.name`)} placeholder="Activity Name" />
-            <Switch {...register(`activities.${index}.chargeable`)} />
-            <Button type="button" onClick={() => remove(index)}>Remove Activity</Button>
+          <div key={field.id} className="flex flex-col md:flex-row mb-4 justify-between">
+            <div className="flex flex-col items-left pr-2 flex-1">
+              <Label className="my-2 mx-4" htmlFor="name">Activity name</Label>
+              <Input {...register(`activities.${index}.name`)} placeholder="Enter the activity name" className='mr-2'/>
+            </div>
+            <div className="flex flex-col items-left pr-2">
+              <Label className="my-2" htmlFor="name">Chargeable</Label>
+              <Switch {...register(`activities.${index}.chargeable`)} className='mr-2'/>
+            </div>
+            <Button variant='flairnowOutline' className='mt-7' type="button" onClick={() => remove(index)}>Remove</Button>
           </div>
         ))}
-        <Button type="button" onClick={() => append({ name: '', chargeable: false })}>Add Activity</Button>
-        <Button type='submit'>Save Activities</Button>
+        <div className='flex justify-between'>
+          <Button variant='flairnowOutline' className='mr-2' type="button" onClick={() => append({ name: '', chargeable: false })}>Add</Button>
+          <Button variant='flairnow' type='submit'>Save Activities</Button>
+        </div>
       </form>
     </Card>
   );

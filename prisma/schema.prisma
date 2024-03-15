@@ -115,6 +115,7 @@ model Client {
   country       String?
   user          ClientUser[]
   sessions      Session[]
+  projects      Project[]
 }
 
 model ClientUser {
@@ -138,14 +139,17 @@ model Project {
   currency        String
   ProjectUsers    ProjectUsers[]
   TimeReport      TimeReport[]
-  startDate       DateTime?
-  endDate         DateTime?
+  startDate       DateTime
+  endDate         DateTime
+  client          Client     @relation(fields: [clientId], references: [id])
+  clientId        String
 }
 
 model Customer {
-  id      String    @id @default(cuid())
-  name    String
-  Project Project[]
+  id          String    @id @default(cuid())
+  name        String
+  Project     Project[]
+
 }
 
 model Activity {
@@ -184,7 +188,7 @@ model ProjectUsers {
 
 model TimeReport {
   id              String            @id @default(cuid())
-  startTime       DateTime
+  startTime       String
   endTime         DateTime
   hours           Int
   notes           String?

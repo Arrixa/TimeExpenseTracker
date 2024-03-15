@@ -25,10 +25,12 @@ export async function POST(req: Request) {
     const createProject = await prisma.project.create({
         data: {
           customer: { connect: { id: createdCustomer.id } },
+          client: { connect: { id: clientId } },
           ...projectInfo
         },
         
       });
+
 
     // Create Activity
     // const createActivity = await prisma.activity.create({
@@ -72,8 +74,9 @@ export async function POST(req: Request) {
   // });
 
 
-      return NextResponse.json({ createProject, message: "Project created successfully"}, { status: 202 })
+      // return NextResponse.json({ createProject, message: "Project created successfully"}, { status: 202 })
     // }
+    return NextResponse.json({ createProject, message: "Project & customer created successfully"}, { status: 201 })
   } catch (error) {
     console.error("Error during creating project:", error);
     return NextResponse.json({ message: "Something went wrong"}, { status: 500 });
