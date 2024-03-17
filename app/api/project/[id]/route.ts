@@ -2,7 +2,9 @@ import prisma from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const id = request.url.split('/').pop();
+  const id = request.url
+  // http://localhost:3000/api/project/[object%20Object] Id in get projects
+  // const id = request.url.split('/').pop();
   // console.log('Request:', request);
   // console.log('Job ID:', id);
   // const jobId = request.nextUrl.searchParams.get('id');
@@ -21,6 +23,7 @@ export async function GET(request: NextRequest) {
 }
 
 async function getProjectData(projectId: string) {
+  console.log(projectId, 'Id in get projects')
 
   const project = await prisma.project.findUnique({
     where: {

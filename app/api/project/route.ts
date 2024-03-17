@@ -11,7 +11,6 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     const clientId = await session?.clientUser.clientId;
     const userId = await session?.user.id;
-    console.log("session user and client id in job posting route", userId, clientId)
     console.log("reqBody in job posting route", reqBody)
 
 
@@ -38,6 +37,36 @@ export async function POST(req: Request) {
   }
 }
 
+export async function GET(request: Request) {
+  try {
+    const postData = await getProjectsData(request);
+    // Respond with the post data
+    return Response.json(postData);
+  } catch (error) {
+    console.error("Error during handling GET request:", error);
+    return Response.json({ message: "Something went wrong" }, { status: 500 });
+  }
+}
+
+async function getProjectsData(request: Request) {
+  const session = await getServerSession(authOptions);
+  console.log(session, 'session in job post route')
+  const clientId = await session?.clientUser.clientId;
+  const projects = await prisma.project.findMany({
+    where: {
+      clientId: clientId,
+    },
+    include: {
+      customer: true, 
+    },
+  });
+
+  if (!projects || projects.length === 0) {
+    return { message: "No job postings found for this client" };
+  }
+  return projects;
+}
+
 
 /*
 export async function POST(req: Request) {
@@ -46,7 +75,6 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     const clientId = await session?.clientUser.clientId;
     const userId = await session?.user.id;
-    console.log("session user and client id in job posting route", userId, clientId)
     console.log("reqBody in job posting route", reqBody)
 
     const { experience, departmentName, jobLevelName, ...jobPost } = reqBody;
@@ -96,64 +124,5 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(request: Request) {
-  try {
-    const jobData = await getJobsData(request);
-    // Respond with the job data
-    return Response.json(jobData);
-  } catch (error) {
-    console.error("Error during handling GET request:", error);
-    return Response.json({ message: "Something went wrong" }, { status: 500 });
-  }
-}
-
-async function getJobsData(request: Request) {
-  const session = await getServerSession(authOptions);
-  console.log(session, 'session in job post route')
-  const clientId = await session?.clientUser.clientId;
-  const jobs = await prisma.jobPosting.findMany({
-    where: {
-      clientId: clientId,
-    },
-    include: {
-      company: true, 
-      department: true,
-      jobLevel: true
-    },
-  });
-
-  if (!jobs || jobs.length === 0) {
-    return { message: "No job postings found for this client" };
-  }
-
-  // Extract and return the relevant data for each job
-  const processedJobs = jobs.map((job: JobCardProps) => ({
-    id: job.id,
-    title: job.title,
-    description: job.description,
-    department: job.department,
-    location: job.location,
-    salary: job.salary,
-    jobLevel: job.jobLevel,
-    employmentType: job.employmentType,
-    workPlace: job.workPlace,
-    postedBy: job.postedBy,
-    workHours: job.workHours,
-    status: job.status,
-    skills: job.skills,
-    company: job.company,
-    positionsNumber: job.positionsNumber,
-    createdAt: job.createdAt,
-    updatedAt: job.updatedAt,
-    experienceMin: job.experienceMin,
-    experienceMax: job.experienceMax,
-    startDate: job.startDate,
-    endDate: job.endDate,
-    dueDate: job.dueDate,
-    closingDate: job.closingDate,
-  }));
-
-  return processedJobs;
-}
 
 */

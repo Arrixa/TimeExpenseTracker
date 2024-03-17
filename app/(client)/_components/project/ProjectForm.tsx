@@ -29,7 +29,8 @@ const FormSchema = z.object({
   endDate: z.string().optional(),
 });
 
-const ProjectForm = (setProjectsData: any) => {
+const ProjectForm = () => {
+  const [projectData, setProjectData] = useState({})
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -76,7 +77,7 @@ const ProjectForm = (setProjectsData: any) => {
           console.log(res, 'res.json');
           const data = res.createProject;
           console.log(data, 'data in correct form?')
-          // setProjectsData(data)
+          setProjectData(data)
           const id = res.createProject.id
           router.push(`/dashboard/project/${id}`)
         } else {

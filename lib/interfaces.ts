@@ -333,4 +333,18 @@ export interface WeekNavigatorProps {
     endDate: string;
 };
 
+export interface ProjectProps {
+  id: string;
+  name: string;
+  code: string;
+  currency: string;
+  customer: {
+    id: string;
+    name: string;
+  };
+  customerId: string;
+  billingMethod: string;
+  startDate: string;
+  endDate: string;
+};
 

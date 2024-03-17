@@ -10,30 +10,26 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     const clientId = await session?.clientUser.clientId;
     const userId = await session?.user.id;
-    console.log("session user and client id in job posting route", userId, clientId);
     console.log("reqBody in job posting route", reqBody);
 
+    const createActivity = await prisma.activity.create({
+      data: {
+        name: reqBody.name,
+        chargable: reqBody.chargeable,
+      },
+    });
 
-    // Loop through each activity in the request body
-      // Create Activity
-      const createActivity = await prisma.activity.create({
-        data: {
-          name: reqBody.name,
-          chargable: reqBody.chargeable,
-        },
-      });
-
-      const createProjectActivity = await prisma.projectActivity.create({
-        data: {
-          chargable: reqBody.chargeable,
-          activity: { connect: { id: createActivity.id } },
-          project: { connect: { id: reqBody.projectId.projectId } }, 
-        },
-      });
-      const ProjectActivity = {
-        ...createActivity,
-        ...createProjectActivity,
-      }
+    const createProjectActivity = await prisma.projectActivity.create({
+      data: {
+        chargable: reqBody.chargeable,
+        activity: { connect: { id: createActivity.id } },
+        project: { connect: { id: reqBody.projectId.projectId } }, 
+      },
+    });
+    const ProjectActivity = {
+      ...createActivity,
+      ...createProjectActivity,
+    }
 
 
     return NextResponse.json({ ProjectActivity, message: "Project created successfully" }, { status: 202 });
