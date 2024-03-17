@@ -14,8 +14,9 @@ import { CurrencySelect } from '@/app/components/common/CurrencySelect';
 import { DateSelect } from '@/app/components/common/DateSelect';
 import { Switch } from '@/app/components/ui/switch';
 import ActivitySelect from './ActivitySelect';
-import { Router } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from '@/app/components/ui/drawer';
+
 
 // Define your form schema here
 const FormSchema = z.object({
@@ -28,7 +29,7 @@ const FormSchema = z.object({
   endDate: z.string().optional(),
 });
 
-const ProjectForm = (setProjectsData) => {
+const ProjectForm = (setProjectsData: any) => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -65,22 +66,19 @@ const ProjectForm = (setProjectsData) => {
           currency: selectedCurrency,
           startDate: startDate,
           endDate: endDate,
-          // users: [''],
-          // activity: selectedActivities,
-          // billable: data.billable,
         })
       })
         if (response.ok) {
-          console.log(response)
           toast({
             description: "The project saved successfully.",
           })
           const res = await response.json();
+          console.log(res, 'res.json');
           const data = res.createProject;
-          setProjectsData(data)
+          console.log(data, 'data in correct form?')
+          // setProjectsData(data)
           const id = res.createProject.id
-          console.log(res);
-          router.push(`/project/${id}`)
+          router.push(`/dashboard/project/${id}`)
         } else {
           toast({
             variant: "destructive",
@@ -100,11 +98,12 @@ const ProjectForm = (setProjectsData) => {
 
   // Render your form fields and buttons
   return (
-    <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5 w-full'>
+    <DrawerContent>
+      <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5 w-full'>
       <CardHeader><CardTitle>Create a new project</CardTitle></CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex flex-col">
+          <div className="flex flex-col mx-2">
             <FormField
               control={form.control}
               name='name'
@@ -133,7 +132,7 @@ const ProjectForm = (setProjectsData) => {
                 </FormItem>
               )}
             />
-            {/* Should be a combobox instead if we want a search feature or skillSelector */}
+            {/* Should be a combobox instead if we want a search name */}
              <FormField
               control={form.control}
               name='customer'
@@ -185,12 +184,12 @@ const ProjectForm = (setProjectsData) => {
             />
           </div>
           </div>
-          <div  className='flex flex-col md:flex-row w-full justify-between'>
+          <div  className='flex flex-col md:flex-row w-full justify-between mx-2'>
             <FormField
               control={form.control}
               name='billingMethod'
               render={({ field }) => (
-                <FormItem className="flex flex-col items-left mt-4">
+                <FormItem className="flex flex-col items-left mt-4 w-full md:w-1/2 md:mr-2">
                   <Label className="mx-4" htmlFor="billingMethod">Billing method</Label>
                   <FormControl className="">
                     <Select
@@ -216,7 +215,7 @@ const ProjectForm = (setProjectsData) => {
               control={form.control}
               name='currency'
               render={({ field }) => (
-                <FormItem className="flex flex-col items-left mt-4 w-full md:w-1/2 md:mr-2">
+                <FormItem className="flex flex-col items-left mt-4 w-full md:w-1/2 mr-4">
                   <Label className="mx-4">Currency</Label>
                   <FormControl>
                   <CurrencySelect {...field} value={selectedCurrency} onChange={(value) => setSelectedCurrency(value)}  />
@@ -226,10 +225,17 @@ const ProjectForm = (setProjectsData) => {
               )}
             />          
           </div>
-          <Button type='submit'>Create Project</Button>
+          <DrawerFooter className='flex flex-col md:flex-row justify-between px-2'>
+            <Button type='submit' variant='flairnow'>Create Project</Button>
+            <DrawerClose asChild>
+              <Button variant="flairnowOutline">Cancel</Button>
+            </DrawerClose>
+          </DrawerFooter>
         </form>
       </Form>
     </Card>
+  </DrawerContent>
+    
   );
 };
 

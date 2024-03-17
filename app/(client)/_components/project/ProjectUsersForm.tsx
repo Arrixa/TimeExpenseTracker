@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from "@/app/components/ui/use-toast";
 import { Label } from '@/app/components/ui/label';
 import { DateSelect } from '@/app/components/common/DateSelect';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from '@/app/components/ui/drawer';
 
 // Define the schema for activities as part of the form
 const FormSchema = z.object({
@@ -88,64 +89,74 @@ const ProjectUsersForm = (projectId: string | string[]) => {
   };
 
   return (
-    <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
-      <CardHeader><CardTitle>Add project users</CardTitle></CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex flex-col md:flex-row mb-4 justify-between">
-            <div className="flex flex-col items-left pr-2 flex-1">
-              <Label className="my-2 mx-4" htmlFor="email">User name</Label>
-              <Input {...register(`projectUsers.${index}.userEmail`)} placeholder="Enter user email" />
+    <DrawerContent>
+      <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
+        <CardHeader><CardTitle>Add project users</CardTitle></CardHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {fields.map((field, index) => (
+            <div key={field.id} className="flex flex-col md:flex-row mb-4 justify-between">
+              <div className="flex flex-col items-left pr-2 flex-1">
+                <Label className="my-2 mx-4" htmlFor="email">User name</Label>
+                <Input {...register(`projectUsers.${index}.userEmail`)} placeholder="Enter user email" />
+              </div>
+              <div className="flex flex-col items-left pr-2 flex-1">
+                <Label className="my-2 mx-4" htmlFor="rate">Rate</Label>
+                <Input {...register(`projectUsers.${index}.rate`)} type="number" placeholder="Rate" />
+              </div>
+              <div className="flex flex-col items-left pr-2 flex-1">
+                <Label className="my-2 mx-4" htmlFor="rateBy">Rate by</Label>
+                <Select
+                onChange={(value) => field.onChange({ target: { value } })}
+                value={field.value}>
+                  <SelectTrigger className="w-full border-border mr-2">
+                      <SelectValue placeholder="Select rate by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="HOUR">Hourly</SelectItem>
+                        <SelectItem value="DAY">Daily</SelectItem>
+                        <SelectItem value="WEEK">Weekly</SelectItem>
+                        <SelectItem value="MONTH">Monthly</SelectItem>
+                      </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex flex-col items-left pr-2">
+                <Label className="my-2" htmlFor="startDate">Start date</Label>
+                <Input type="date" className="w-full" placeholder="" {...register(`projectUsers.${index}.startDate`)} autoFocus />
+              </div>
+              <div className="flex flex-col items-left pr-2">
+                <Label className="my-2" htmlFor="endDate">End date</Label>
+                <Input type="date" className="w-full" placeholder="" {...register(`projectUsers.${index}.endDate`)} autoFocus />
+              </div>
+              <div className="flex flex-col items-left pr-2">
+                <Label className="my-2" htmlFor="approver">Approver</Label>
+                <Switch {...register(`projectUsers.${index}.approver`)} className='mr-2'/>
+              </div>
+              <div className="flex flex-col items-left pr-2">
+                <Label className="my-2" htmlFor="reviewer">Reviewer</Label>
+                <Switch {...register(`projectUsers.${index}.reviewer`)} className='mr-2'/>
+              </div>
+              <Button variant='flairnowOutline' className='mt-7' type="button" onClick={() => remove(index)}>Remove</Button>
             </div>
-            <div className="flex flex-col items-left pr-2 flex-1">
-              <Label className="my-2 mx-4" htmlFor="rate">Rate</Label>
-              <Input {...register(`projectUsers.${index}.rate`)} type="number" placeholder="Rate" />
-            </div>
-            <div className="flex flex-col items-left pr-2 flex-1">
-              <Label className="my-2 mx-4" htmlFor="rateBy">Rate by</Label>
-              <Select
-              onChange={(value) => field.onChange({ target: { value } })}
-              value={field.value}>
-                <SelectTrigger className="w-full border-border mr-2">
-                    <SelectValue placeholder="Select rate by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="HOUR">Hourly</SelectItem>
-                      <SelectItem value="DAY">Daily</SelectItem>
-                      <SelectItem value="WEEK">Weekly</SelectItem>
-                      <SelectItem value="MONTH">Monthly</SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="flex flex-col items-left pr-2">
-              <Label className="my-2" htmlFor="startDate">Start date</Label>
-              <Input type="date" className="w-full" placeholder="" {...register(`projectUsers.${index}.startDate`)} autoFocus />
-            </div>
-            <div className="flex flex-col items-left pr-2">
-              <Label className="my-2" htmlFor="endDate">End date</Label>
-              <Input type="date" className="w-full" placeholder="" {...register(`projectUsers.${index}.endDate`)} autoFocus />
-            </div>
-            <div className="flex flex-col items-left pr-2">
-              <Label className="my-2" htmlFor="approver">Approver</Label>
-              <Switch {...register(`projectUsers.${index}.approver`)} className='mr-2'/>
-            </div>
-            <div className="flex flex-col items-left pr-2">
-              <Label className="my-2" htmlFor="reviewer">Reviewer</Label>
-              <Switch {...register(`projectUsers.${index}.reviewer`)} className='mr-2'/>
-            </div>
-            <Button variant='flairnowOutline' className='mt-7' type="button" onClick={() => remove(index)}>Remove</Button>
-          </div>
-        ))}
-        <div className='flex justify-between'>
-          <Button variant='flairnowOutline' className='mr-2' type="button" onClick={() => append({ name: '', chargeable: false })}>Add</Button>
-          <Button variant='flairnow' type='submit'>Save project users</Button>
-        </div>
-      </form>
-    </Card>
+          ))}
+
+          <DrawerFooter className='flex flex-col md:flex-row justify-between px-2'>
+            <DrawerClose asChild>
+              <Button variant="flairnowOutline">Cancel</Button>
+            </DrawerClose>
+            <Button variant='flairnow' type='submit'>Save</Button>
+          </DrawerFooter>
+        </form>
+      </Card>
+    </DrawerContent>
   );
 };
 
 export default ProjectUsersForm
+
+{/* <div className='flex justify-between'>
+<Button variant='flairnowOutline' className='mr-2' type="button" onClick={() => append({ name: '', chargeable: false })}>Add</Button> 
+<Button variant='flairnow' type='submit'>Save project users</Button>
+</div> */}

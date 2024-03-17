@@ -8,33 +8,25 @@ import { Switch } from '@/app/components/ui/switch';
 import { Card, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form';
 import { useToast } from "@/app/components/ui/use-toast";
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from '@/app/components/ui/drawer';
 import { Label } from '@/app/components/ui/label';
 
 // Define the schema for activities as part of the form
 const FormSchema = z.object({
-  activities: z.array(z.object({
-    name: z.string().min(1, 'Activity name is required'),
-    chargeable: z.boolean(),
-  })),
+  name: z.string().min(1, 'Activity name is required'),
+  chargeable: z.boolean(),
 });
 
-const ActivityForm = (projectId) => {
-  const { control, handleSubmit, register } = useForm({
+const ActivityForm = (projectId: string | string[]) => {
+  const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      activities: [{ name: '', chargeable: false }],
+      name: '',
+      chargeable: false,
     },
   });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'activities',
-  });
+ 
   const { toast } = useToast();
-
-  // const saveActivity = async (activity) => {
-  //   console.log('Saving activity:', activity, projectId);
-  //   // Implement API call to save the activity here
-  // };
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     // console.log('Form submitted:', data);
@@ -46,8 +38,8 @@ const ActivityForm = (projectId) => {
         },
         body: JSON.stringify({
           projectId: projectId,
-          activity: data.activities
-          
+          name: data.name,
+          chargeable: data.chargeable       
         })
       })
         if (response.ok) {
@@ -77,28 +69,54 @@ const ActivityForm = (projectId) => {
   };
 
   return (
-    <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
-      <CardHeader><CardTitle>Add project activities</CardTitle></CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex flex-col md:flex-row mb-4 justify-between">
-            <div className="flex flex-col items-left pr-2 flex-1">
-              <Label className="my-2 mx-4" htmlFor="name">Activity name</Label>
-              <Input {...register(`activities.${index}.name`)} placeholder="Enter the activity name" className='mr-2'/>
+    <DrawerContent>
+      <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
+        <CardHeader><CardTitle>Add project activity</CardTitle></CardHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="flex flex-col md:flex-row mb-4 justify-between">
+              <FormField 
+                control={form.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+                    <Label className=" mx-4" htmlFor="name">Activity name</Label>
+                    <FormControl className="">
+                      <Input type="text" id="name" placeholder='Enter a activity name' 
+                        {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField 
+                control={form.control}
+                name='chargeable'
+                render={({ field }) => (
+                  <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+                    <Label className=" mx-4" htmlFor="chargeable">Chargeable</Label>
+                    <FormControl className="">
+                      <Switch id="chargeable"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className='mx-4' />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <div className="flex flex-col items-left pr-2">
-              <Label className="my-2" htmlFor="name">Chargeable</Label>
-              <Switch {...register(`activities.${index}.chargeable`)} className='mr-2'/>
-            </div>
-            <Button variant='flairnowOutline' className='mt-7' type="button" onClick={() => remove(index)}>Remove</Button>
-          </div>
-        ))}
-        <div className='flex justify-between'>
-          <Button variant='flairnowOutline' className='mr-2' type="button" onClick={() => append({ name: '', chargeable: false })}>Add</Button>
-          <Button variant='flairnow' type='submit'>Save Activities</Button>
-        </div>
-      </form>
-    </Card>
+            <DrawerFooter className='flex flex-col md:flex-row justify-between px-2'>
+              {/* <Button variant='flairnowOutline' className='mr-2' type="button" onClick={() => append({ name: '', chargeable: false })}>Add</Button> */}
+              <DrawerClose asChild>
+                <Button variant="flairnowOutline">Cancel</Button>
+              </DrawerClose>
+              <Button variant='flairnow' type='submit'>Save</Button>
+            </DrawerFooter>
+          </form>
+        </Form>             
+      </Card>
+    </DrawerContent>
   );
 };
 

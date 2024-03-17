@@ -7,10 +7,9 @@ import { Skeleton } from '@/app/components/ui/skeleton';
 import { Button } from '@/app/components/ui/button';
 import ProjectForm from './ProjectForm';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from '@/app/components/ui/drawer';
+import ActivityForm from './ActivityForm';
+import ProjectUsersForm from './ProjectUsersForm';
 // import { ToggleGroup, ToggleGroupItem } from '@/app/components/ui/toggle-group';
-// import JobsGridComp from '../../_components/jobs/jobsGrid/JobsGrid';
-// import JobSearch from './JobSearch'
-// import JobsFilterDrawer from './JobsFilterDrawer'
 
 const ProjectsDashboard = () => {
   const [projectsData, setProjectsData] = useState([]);
@@ -34,6 +33,8 @@ const ProjectsDashboard = () => {
 
   console.log(projectsData, 'fetched jobs')
 
+  const projectId = '1'
+
   return (
     <main className='flex flex-col items-left w-full lg:p-10 md:p-6 p-4'>
       <Card className='p-2 flex items-center justify-left'>
@@ -42,15 +43,10 @@ const ProjectsDashboard = () => {
             <DrawerTrigger asChild>
               <Button variant="flairnowOutline" className='mt-4'>Create a new project</Button>
             </DrawerTrigger>
-            <DrawerContent>
-              <ProjectForm setProjectsData={setProjectsData} />
-              <DrawerFooter>
-              <DrawerClose asChild>
-                <Button variant="flairnowOutline">Cancel</Button>
-              </DrawerClose>
-            </DrawerFooter>
-            </DrawerContent>
+            <ProjectForm setProjectsData={setProjectsData} />
+            
           </Drawer>
+          
         </CardContent>
       </Card>
       <Card className='flex items-center justify-between mt-2'>

@@ -13,35 +13,27 @@ export async function POST(req: Request) {
     console.log("session user and client id in job posting route", userId, clientId);
     console.log("reqBody in job posting route", reqBody);
 
-    // Ensure reqBody has the `activity` property with at least one element
-    if (!Array.isArray(reqBody.activity) || reqBody.activity.length === 0) {
-      throw new Error('Activities array is empty or not provided.');
-    }
-
-    let ProjectActivity
 
     // Loop through each activity in the request body
-    for (const activityData of reqBody.activity) { // Corrected from reqBody.activities to reqBody.activity
       // Create Activity
       const createActivity = await prisma.activity.create({
         data: {
-          name: activityData.name,
-          chargable: activityData.chargeable,
+          name: reqBody.name,
+          chargable: reqBody.chargeable,
         },
       });
 
       const createProjectActivity = await prisma.projectActivity.create({
         data: {
-          chargable: activityData.chargeable,
+          chargable: reqBody.chargeable,
           activity: { connect: { id: createActivity.id } },
-          project: { connect: { id: reqBody.projectId } }, 
+          project: { connect: { id: reqBody.projectId.projectId } }, 
         },
       });
-      ProjectActivity = {
+      const ProjectActivity = {
         ...createActivity,
         ...createProjectActivity,
       }
-    }
 
 
     return NextResponse.json({ ProjectActivity, message: "Project created successfully" }, { status: 202 });

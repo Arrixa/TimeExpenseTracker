@@ -1,4 +1,4 @@
-'use server'
+// 'use server'
 import renderLogoInline from "@/app/components/common/logos/LogoInline";
 import SignUpForm from "../../_components/auth/SignupForm";
 import Image from "next/image";
