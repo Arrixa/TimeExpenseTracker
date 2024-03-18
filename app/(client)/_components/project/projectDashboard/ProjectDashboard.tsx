@@ -1,14 +1,26 @@
-'use client'
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
-import Link from 'next/link';
-import { LayoutGrid, LayoutList, Plus } from 'lucide-react';
-import { Skeleton } from '@/app/components/ui/skeleton';
-import { Button } from '@/app/components/ui/button';
-import ProjectForm from './ProjectForm';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from '@/app/components/ui/drawer';
-import { columns } from './columns';
-import { DataTable } from '@/app/components/ui/data-table';
+"use client";
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import Link from "next/link";
+import { LayoutGrid, LayoutList, Plus } from "lucide-react";
+import { Skeleton } from "@/app/components/ui/skeleton";
+import { Button } from "@/app/components/ui/button";
+import ProjectForm from "./ProjectForm";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+} from "@/app/components/ui/drawer";
+import { columns } from "./columns";
+import { DataTable } from "@/app/components/ui/data-table";
 // import { ToggleGroup, ToggleGroupItem } from '@/app/components/ui/toggle-group';
 
 const ProjectsDashboard = () => {
@@ -17,46 +29,47 @@ const ProjectsDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/project');
+        const response = await fetch("/api/project");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
-        } 
+        }
         const data = await response.json();
         setProjectsData(data);
       } catch (error) {
-        console.error('Error fetching job data:', error);
+        console.error("Error fetching job data:", error);
       }
     };
 
     fetchData();
   }, []);
 
-  console.log(projectsData, 'fetched jobs')
-
+  console.log(projectsData, "fetched jobs");
 
   return (
-    <main className='flex flex-col items-left w-full lg:p-10 md:p-6 p-4'>
-      <Card className='p-2 flex items-center justify-left'>
+    <main className="flex flex-col items-left w-full lg:p-10 md:p-6 p-4">
+      <Card className="p-2 flex items-center justify-left">
         <CardContent>
           <Drawer>
             <DrawerTrigger asChild>
-              <Button variant="flairnowOutline" className='mt-4'>Create a new project</Button>
+              <Button variant="flairnowOutline" className="mt-4">
+                Create a new project
+              </Button>
             </DrawerTrigger>
-            <ProjectForm />            
-          </Drawer>        
+            <ProjectForm />
+          </Drawer>
         </CardContent>
       </Card>
-      <Card className='flex flex-col justify-between mt-2'>
+      <Card className="flex flex-col justify-between mt-2">
         <CardHeader>
-          <CardTitle  className='px-4 py-2'>Projects</CardTitle>
-          <CardDescription  className='px-4'>Manage your projects</CardDescription>
+          <CardTitle className="px-4 py-2">Projects</CardTitle>
+          <CardDescription className="px-4">
+            Manage your projects
+          </CardDescription>
         </CardHeader>
-        <CardContent className=''>
+        <CardContent className="">
           <DataTable columns={columns} data={projectsData} />
         </CardContent>
       </Card>
-      
-      
     </main>
   );
 };

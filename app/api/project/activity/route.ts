@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       data: {
         chargable: reqBody.chargeable,
         activity: { connect: { id: createActivity.id } },
-        project: { connect: { id: reqBody.projectId.projectId } }, 
+        project: { connect: { id: reqBody.projectId } }, 
       },
     });
     const ProjectActivity = {

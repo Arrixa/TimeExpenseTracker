@@ -17,7 +17,8 @@ const FormSchema = z.object({
   chargeable: z.boolean(),
 });
 
-const ActivityForm = ({ id }: { id: string }) => {
+const ActivityForm = ({ id, onActivityAdded }: { id: string, onActivityAdded: () => void }) => {
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -31,7 +32,7 @@ const ActivityForm = ({ id }: { id: string }) => {
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     // console.log('Form submitted:', data);
     try {
-      const response = await fetch('/api/activity', {
+      const response = await fetch('/api/project/activity', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -44,8 +45,9 @@ const ActivityForm = ({ id }: { id: string }) => {
       })
         if (response.ok) {
           console.log(response)
+          onActivityAdded();
           toast({
-            description: "The project saved successfully.",
+            description: "The activity saved successfully.",
           })
           const res = await response.json();
           const data = res.ProjectActivity

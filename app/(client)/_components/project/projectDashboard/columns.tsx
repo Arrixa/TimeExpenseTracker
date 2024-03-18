@@ -1,21 +1,8 @@
 import { capitaliseFirstLetter } from "@/lib/capitiliseFirstLetter";
+import { formatEnum } from "@/lib/formatEnum";
 import { ProjectProps } from "@/lib/interfaces";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-
-const formatBillingMethod = (str: string): string => {
-  if (typeof str !== 'string') {
-    console.error('Input is not a string:', str);
-    return ''; 
-  }
-
-  return str
-    .split('_') 
-    .map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() 
-    )
-    .join(' ');
-};
 
 export const columns: ColumnDef<ProjectProps>[] = [
   {
@@ -40,7 +27,7 @@ export const columns: ColumnDef<ProjectProps>[] = [
   {
     accessorKey: 'billingMethod',
     header: 'Billing Method',
-    cell: info => formatBillingMethod(info.getValue() as string)
+    cell: info => formatEnum(info.getValue() as string)
   },
   {
     accessorKey: 'currency',

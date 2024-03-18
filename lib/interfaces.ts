@@ -348,3 +348,25 @@ export interface ProjectProps {
   endDate: string;
 };
 
+export interface ActivityProps {
+  chargable: boolean;
+  id: string;
+  name: string;
+}
+
+export interface ProjectUserProps {
+  approver: boolean;
+  reviewer: boolean;
+  endDate: string;
+  startDate: string;
+  rate: number;
+  rateBy: string;
+  userEmail: string;
+  userId: string;
+}
+
+export interface ProjectUserCardProps {
+  id: string;
+  users: ProjectUserProps[];
+  refreshActivities: () => Promise<void>;
+}

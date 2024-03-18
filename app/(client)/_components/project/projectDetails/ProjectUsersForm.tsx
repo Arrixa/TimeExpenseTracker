@@ -25,7 +25,7 @@ const FormSchema = z.object({
   reviewer: z.boolean().optional(),
 });
 
-const ProjectUsersForm = (id: { id: string }) => {
+const ProjectUsersForm = (id, onUserAdded) => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -44,7 +44,7 @@ const ProjectUsersForm = (id: { id: string }) => {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    console.log('form submit clicked', data)
+    console.log('form submit clicked', data, 'start and end date', startDate, endDate, id)
     try {
       const response = await fetch('/api/project/users', {
         method: 'POST',
@@ -52,7 +52,7 @@ const ProjectUsersForm = (id: { id: string }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          projectId: id,
+          projectId: id.id.id,
           userEmail: data.userEmail,
           rate: data.rate,
           rateBy: data.rateBy,
@@ -65,6 +65,7 @@ const ProjectUsersForm = (id: { id: string }) => {
       })
         if (response.ok) {
           console.log(response)
+          onUserAdded()
           toast({
             description: "The project users saved successfully.",
           })
@@ -83,7 +84,7 @@ const ProjectUsersForm = (id: { id: string }) => {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Activity creation failed.",
+        title: "Project user save failed.",
         description: "Please try again.",
       });
     }
