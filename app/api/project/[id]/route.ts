@@ -2,16 +2,7 @@ import prisma from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const id = request.url
-  // http://localhost:3000/api/project/[object%20Object] Id in get projects
-  // const id = request.url.split('/').pop();
-  // console.log('Request:', request);
-  // console.log('Job ID:', id);
-  // const jobId = request.nextUrl.searchParams.get('id');
-  // console.log('Job ID from search params:', jobId);
-  // const jobId = request.params.id;
-  // const { id } = request.params;
-  // const { id } = request.query;
+  const id = request.url.split('/').pop();
   try {
     const projectData = await getProjectData(id as string);
     console.log('project data:', projectData);

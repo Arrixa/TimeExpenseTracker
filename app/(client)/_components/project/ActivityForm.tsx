@@ -17,7 +17,7 @@ const FormSchema = z.object({
   chargeable: z.boolean(),
 });
 
-const ActivityForm = (projectId: string | string[]) => {
+const ActivityForm = ({ id }: { id: string }) => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -37,7 +37,7 @@ const ActivityForm = (projectId: string | string[]) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          projectId: projectId,
+          projectId: id,
           name: data.name,
           chargeable: data.chargeable       
         })
@@ -107,7 +107,6 @@ const ActivityForm = (projectId: string | string[]) => {
               />
             </div>
             <DrawerFooter className='flex flex-col md:flex-row justify-between px-2'>
-              {/* <Button variant='flairnowOutline' className='mr-2' type="button" onClick={() => append({ name: '', chargeable: false })}>Add</Button> */}
               <DrawerClose asChild>
                 <Button variant="flairnowOutline">Cancel</Button>
               </DrawerClose>

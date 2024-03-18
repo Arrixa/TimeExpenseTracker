@@ -11,17 +11,18 @@ import { Button } from '@/app/components/ui/button';
 import ActivityForm from './ActivityForm';
 import ActivityCard from './ActivityCard';
 import ProjectUsersForm from './ProjectUsersForm';
+import { ProjectProps } from '@/lib/interfaces';
 
 
-const ProjectCard = (projectId: string | string[]) => {
-  const [project, setProject] = useState({});
+const ProjectCard = ({ id }: { id: string }) => {
+  const [project, setProject] = useState<ProjectProps | null>(null);
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
-        const response = await fetch(`/api/project/${projectId}`); 
+        const response = await fetch(`/api/project/${id}`); 
         if (response.ok) {
-          const projectData = await response.json();
+          const projectData: ProjectProps = await response.json();
           console.log(projectData)
           setProject(projectData);
         } else {
@@ -32,16 +33,21 @@ const ProjectCard = (projectId: string | string[]) => {
       }
     };
 
-    if (projectId) {
+    if (id) {
       fetchProjectDetails();
     }
-    // if (!project || project == null) {
-    //   fetchProjectDetails();
-    // }
-  }, [projectId]);
+  }, [id]);
 
   if (!project) {
-    return <div>Loading...</div>;
+    return (
+      <Card className="p-6 h-fit flex items-center justify-center flex-col bg-background">
+        <CardTitle className="text-xl py-2 text-center">Loading...</CardTitle>
+        <CardDescription className="text-lg text-center">Please wait while the content is loading.</CardDescription>
+        <CardContent>
+          <Skeleton className="w-[200px] h-[40px] rounded-full my-10" />
+        </CardContent>
+      </Card>
+    )
   }
 
   console.log(project, 'project data')
@@ -55,7 +61,9 @@ const ProjectCard = (projectId: string | string[]) => {
 
   return (
     <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
-      {project.code}
+      <CardHeader>
+      <h1 className="text-3xl text-left font-semibold pt-2">Project details - {project.code}</h1>
+      </CardHeader>     
       <div className='flex flex-col md:flex-row justify-between'>
         <CardContent className='w-1/2'>
           <Label>Project Name:</Label>

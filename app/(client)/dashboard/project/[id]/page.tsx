@@ -12,24 +12,24 @@ import ActivityForm from '@/app/(client)/_components/project/ActivityForm';
 const ProjectDetailsPage = () => {
   
   // Extracting values from the search parameters
-  const { id } = useParams();
+  const { id }: { id: string } = useParams();
+  console.log(id, 'id in project page')
 
   return (
     <section className='flex flex-col items-left w-full lg:p-10 md:p-6 p-4'>
-      <h1 className="text-3xl text-left font-semibold my-4 pt-8 px-6">Project details</h1>
-      <ProjectCard projectId={id} />
-      <Card className='flex flex-col md:flex-row justify-between px-4 pb-4 mx-2'>
+      <ProjectCard id={id} />
+      <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5 flex flex-col md:flex-row justify-between'>
         <Drawer>
           <DrawerTrigger asChild>
             <Button variant="flairnowOutline" className='mt-4'>Add activities</Button>
           </DrawerTrigger>
-          <ActivityForm projectId={id} />           
+          <ActivityForm id={id} />           
         </Drawer>
         <Drawer>
           <DrawerTrigger asChild>
             <Button variant="flairnowOutline" className='mt-4'>Add project users</Button>
           </DrawerTrigger>
-          <ProjectUsersForm projectId={id} />           
+          <ProjectUsersForm id={id} />           
         </Drawer>  
       </Card> 
     </section>

@@ -25,7 +25,7 @@ const FormSchema = z.object({
   reviewer: z.boolean().optional(),
 });
 
-const ProjectUsersForm = (projectId: string | string[]) => {
+const ProjectUsersForm = (id: { id: string }) => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -52,7 +52,7 @@ const ProjectUsersForm = (projectId: string | string[]) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          projectId: projectId as string | string[],
+          projectId: id,
           userEmail: data.userEmail,
           rate: data.rate,
           rateBy: data.rateBy,
