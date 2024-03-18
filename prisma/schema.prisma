@@ -139,7 +139,7 @@ model Project {
   billingMethod   Billing
   currency        String
   ProjectUsers    ProjectUsers[]
-  TimeReport      TimeReport[]
+  //TimeReport      TimeReport[]
   startDate       DateTime
   endDate         DateTime
   client          Client     @relation(fields: [clientId], references: [id])
@@ -158,7 +158,7 @@ model Activity {
   name            String
   chargable       Boolean           @default(true)
   ProjectActivity ProjectActivity[]
-  TimeReport      TimeReport[]
+  //TimeReport      TimeReport[]
 }
 
 model ProjectActivity {
@@ -189,21 +189,21 @@ model ProjectUsers {
 
 model TimeReport {
   id              String            @id @default(cuid())
-  startTime       String
+  startTime       DateTime
   endTime         DateTime
   hours           Int
   notes           String?
   status          Status
-  project         Project           @relation(fields: [projectId], references: [id])
-  activity        Activity          @relation(fields: [activityId], references: [id])
   user            User              @relation(fields: [userId], references: [id])
   userId          String
-  approver        ProjectUsers      @relation(fields: [approverId], references: [id])
-  approverId      String
+  approver        ProjectUsers?      @relation(fields: [approverId], references: [id])
+  approverId      String?
   ProjectActivity ProjectActivity[]
-  projectId       String
-  activityId      String
   comment         String?
+  //project         Project           @relation(fields: [projectId], references: [id])
+  //activity        Activity          @relation(fields: [activityId], references: [id])
+  //projectId       String
+  //activityId      String
 }
 
 //added for leave Request

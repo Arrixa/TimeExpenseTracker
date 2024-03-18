@@ -21,7 +21,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/app/components/ui/select";
-import { DaySchedule } from '@/lib/interfaces';
+import { DaySchedule, allProjectsProps, WeeklyScheduleProps, ProjectActivityProps, TimeEntry } from '@/lib/interfaces';
 import { generateSchedule } from '@/lib/time/generateSchedule';
 import { calculateTotalHours } from '@/lib/time/calculateTotalHours';
 import { handleTimeChange } from '@/lib/time/handleTimeChange';
@@ -54,13 +54,18 @@ import WeekNavigator from './WeekNavigator';
 
 const initialSchedule: DaySchedule[] = [];
  
- 
-const WeeklySchedule = () => {
+const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ allProjects }) => {
+    console.log(allProjects, 'PROJECT + ACTIVITY DATA')
     const [schedule, setSchedule] = useState<DaySchedule[]>(initialSchedule);
- 
+    const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+    const [selectedActivityId, setSelectedActivityId] = useState<string>('');
+    const [filteredActivities, setFilteredActivities] = useState<ProjectActivityProps[]>([]);
     const [currentWeek, setCurrentWeek] = useState<number>(0);
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
+    const [startTime, setStartTime] = useState<string>('08:00')
+    const [endTime, setEndTime] = useState<string>('17:00')
+
  
     const totalHoursDisplayRef = useRef<HTMLElement>(null);
  
@@ -76,15 +81,15 @@ const WeeklySchedule = () => {
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(endOfWeek.getDate() + 6);
  
-        setStartDate(startOfWeek.toLocaleDateString('en-US', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
+        setStartDate(startOfWeek.toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
         }));
-        setEndDate(endOfWeek.toLocaleDateString('en-US', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
+        setEndDate(endOfWeek.toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
         }));
  
         const genSchedule = generateSchedule(startOfWeek, endOfWeek); // Generate initial schedule
@@ -100,21 +105,21 @@ const WeeklySchedule = () => {
       const nextWeekEnd = new Date(nextWeekStart);
       nextWeekEnd.setDate(nextWeekEnd.getDate() + 6);
 
-      setStartDate(nextWeekStart.toLocaleDateString('en-US', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
+      setStartDate(nextWeekStart.toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
       }));
-      setEndDate(nextWeekEnd.toLocaleDateString('en-US', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
+      setEndDate(nextWeekEnd.toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
       }));
 
       generateSchedule(nextWeekStart, nextWeekEnd); // Generate schedule for previous week
-  }
+    }
 
-  const handlePreviousWeek = () => {
+    const handlePreviousWeek = () => {
     setCurrentWeek(currentWeek - 1);
 
     const prevWeekStart = new Date(startDate);
@@ -123,40 +128,118 @@ const WeeklySchedule = () => {
     const prevWeekEnd = new Date(prevWeekStart);
     prevWeekEnd.setDate(prevWeekEnd.getDate() + 6);
 
-    setStartDate(prevWeekStart.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: 'short',
+    setStartDate(prevWeekStart.toLocaleDateString('en-CA', {
         year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
     }));
-    setEndDate(prevWeekEnd.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: 'short',
+    setEndDate(prevWeekEnd.toLocaleDateString('en-CA', {
         year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
     }));
 
     generateSchedule(prevWeekStart, prevWeekEnd); // Generate schedule for previous week
-};
+    };
 
-  const handleCurrentWeek = () => {
+    const handleCurrentWeek = () => {
       const now = new Date();
       const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)));
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(endOfWeek.getDate() + 6);
     
-      setStartDate(startOfWeek.toLocaleDateString('en-US', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
+      setStartDate(startOfWeek.toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
       }));
-      setEndDate(endOfWeek.toLocaleDateString('en-US', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
+      setEndDate(endOfWeek.toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
       }));
     
       setCurrentWeek(Math.ceil((now.getTime() - startOfWeek.getTime()) / (1000 * 60 * 60 * 24 * 7))); // Calculate current week number
       generateSchedule(startOfWeek, endOfWeek); // Generate schedule for current week
     };
+
+    useEffect(() => {
+        if (selectedProjectId) {
+          const activitiesForProject = allProjects.activities.filter(activity => activity.projectId === selectedProjectId);
+          setFilteredActivities(activitiesForProject);
+        }
+      }, [selectedProjectId, allProjects.activities]);
+
+      const handleSaveAll = async () => {
+        // Transform schedule state to match backend expectations
+        const timeEntries: TimeEntry[] = schedule.flatMap(daySchedule => 
+          daySchedule.hours.map(hourEntry => ({
+            day: daySchedule.day,
+            date: daySchedule.isoDate,
+            startTime: hourEntry.startTime,
+            endTime: hourEntry.endTime,
+            notes: hourEntry.notes,
+            projectId: selectedProjectId, 
+            activityId: selectedActivityId, 
+          }))
+        );
+      
+        try {
+          const response = await fetch('/api/time', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(timeEntries),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to save time entries');
+          }
+      
+          // Handle successful save (e.g., clear form, show message)
+          console.log('Time entries saved successfully');
+          // Optionally, clear the form or give user feedback
+        } catch (error) {
+          console.error('Error saving time entries:', error);
+          // Handle error (e.g., show error message to user)
+        }
+      };  
+
+      const handleSave = async (dayIndex: number) => {
+        // Transform schedule state to match backend expectations
+        const daySchedule = schedule[dayIndex];
+        const timeEntries: TimeEntry[] = daySchedule.hours.map(hourEntry => ({
+            day: daySchedule.day,
+            date: daySchedule.isoDate,
+            startTime: hourEntry.startTime,
+            endTime: hourEntry.endTime,
+            notes: hourEntry.notes,
+            projectId: selectedProjectId, 
+            activityId: selectedActivityId, 
+        }));
+      
+        try {
+          const response = await fetch('/api/time', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(timeEntries),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to save time entries');
+          }
+      
+          // Handle successful save (e.g., clear form, show message)
+          console.log('Time entries saved successfully');
+          // Optionally, clear the form or give user feedback
+        } catch (error) {
+          console.error('Error saving time entries:', error);
+          // Handle error (e.g., show error message to user)
+        }
+      };  
  
     return (
         <div className='flex flex-col lg:flex-row'>
@@ -189,7 +272,9 @@ const WeeklySchedule = () => {
                                             value={schedule[dayIndex].hours[entryIndex].startTime}
                                             placeholder='08:00'
                                             onChange={(e: any) =>
-                                              handleTimeChange(dayIndex, entryIndex, 'startTime', e.target.value, schedule, setSchedule, totalHoursDisplayRef)}
+                                              handleTimeChange(dayIndex, entryIndex, 'startTime', e.target.value, schedule, setSchedule, totalHoursDisplayRef,
+                                              setStartTime(e.target.value)
+                                              )}
                                         />
                                     {/* </div>
                                     <div className="flex-1"> */}
@@ -198,38 +283,37 @@ const WeeklySchedule = () => {
                                             type='time'
                                             value={schedule[dayIndex].hours[entryIndex].endTime}
                                             placeholder='17:00'
-                                            onChange={(e: any) => handleTimeChange(dayIndex, entryIndex, 'endTime', e.target.value, schedule, setSchedule, totalHoursDisplayRef)}
+                                            onChange={(e: any) => handleTimeChange(dayIndex, entryIndex, 'endTime', e.target.value, schedule, setSchedule, totalHoursDisplayRef,
+                                            // setEndTime(value)
+                                            )}
                                         />
                                     </div>
                                     <div className="flex flex-row mb-2">
-                                        <Select>
-                                            <SelectTrigger className="w-[150px] border-border mr-2">
-                                                <SelectValue placeholder="Select project" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectItem value="project1">Project 1</SelectItem>
-                                                    <SelectItem value="project2">Project 2</SelectItem>
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                    {/* </div>
-                                    <div className="flex-1"> */}
-                                        <Select>
-                                            <SelectTrigger className="w-[150px] border-border mr-2">
-                                                <SelectValue placeholder="Select activity" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectItem value="activityA">Activity A</SelectItem>
-                                                    <SelectItem value="activityB">Activity B</SelectItem>
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
+                                    <Select onValueChange={setSelectedProjectId}>
+                                        <SelectTrigger className="w-[150px] border-border mr-2">
+                                            <SelectValue placeholder="Select project" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {allProjects.projects.map((project) => (
+                                            <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    <Select disabled={!selectedProjectId} onValueChange={setSelectedActivityId}>
+                                        <SelectTrigger className="w-[150px] border-border mr-2">
+                                            <SelectValue placeholder="Select activity" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {filteredActivities.map((activity) => (
+                                            <SelectItem key={activity.id} value={activity.activityId}>{activity.activityName}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     </div>
                                     <div className="flex flex-row">
                                         <div className="flex-1">
-                                            <Input className='md:w-96'
+                                            <Input className='md:w-96 mr-2'
                                                 placeholder="Notes"
                                             />
                                         </div>
@@ -240,18 +324,28 @@ const WeeklySchedule = () => {
                                     </div>
                                 </div>
                             ))}
-                            <Button
-                                variant={'outline'}
-                                className="mt-2"
-                                onClick={() => addHours(dayIndex, schedule, setSchedule)}
-                            >
-                                <IoAddCircle />&nbsp; Add hours
-                            </Button>
+                            <div className='flex flex-col md:flex-row justify-between'>
+                                <Button
+                                    variant={'flairnowOutline'}
+                                    className="mt-2"
+                                    onClick={() => addHours(dayIndex, schedule, setSchedule)}
+                                >
+                                    <IoAddCircle />&nbsp; Add hours
+                                </Button>
+                                <Button
+                                    className="mt-2"
+                                    variant='flairnow'
+                                    onClick={() => handleSave(dayIndex)}
+                                >
+                                    Save
+                                </Button>
+
+                            </div>
                         </CardContent>
                     </Card>
                 ))}
             </div>
-            <TotalHours schedule={schedule} />
+            <TotalHours schedule={schedule} handleSaveAll={handleSaveAll} />
         </div>
     );
 };

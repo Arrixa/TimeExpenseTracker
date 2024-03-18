@@ -322,8 +322,20 @@ export interface HourEntry {
 export interface DaySchedule {
   day: string;
   date: string;
+  isoDate: string;
   hours: HourEntry[];
 };
+
+export interface TimeEntry {
+  day: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  notes: string;
+  projectId: string;
+  activityId: string;
+}
+
 
 export interface WeekNavigatorProps {
     handlePreviousWeek: () => void;
@@ -354,6 +366,16 @@ export interface ActivityProps {
   name: string;
 }
 
+export interface ProjectActivityProps {
+  projectId: string;
+  projectName: string;
+  id: string;
+  activityId: string;
+  activityName: string;
+  chargable: boolean;
+  timeReportId: string | null;
+}
+
 export interface ProjectUserProps {
   approver: boolean;
   reviewer: boolean;
@@ -369,4 +391,14 @@ export interface ProjectUserCardProps {
   id: string;
   users: ProjectUserProps[];
   refreshActivities: () => Promise<void>;
+}
+
+export interface allProjectsProps {
+  users: ProjectUserProps[];
+  activities: ProjectActivityProps[];
+  projects: ProjectProps[];
+}
+
+export interface WeeklyScheduleProps {
+  allProjects: allProjectsProps;
 }
