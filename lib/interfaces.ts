@@ -312,29 +312,20 @@ export interface SessionProps {
     logo: string;
 }
 
-export interface HourEntry {
+export interface TimeEntry {
   startTime: string;
   endTime: string;
   notes: string;
-  type: string;
-};
+  timeZone: string;
+  projectActivityId: string;
+}
 
 export interface DaySchedule {
   day: string;
   date: string;
   isoDate: string;
-  hours: HourEntry[];
-};
-
-export interface TimeEntry {
-  day: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  notes: string;
-  projectActivityId: string;
+  data: TimeEntry[];
 }
-
 
 export interface WeekNavigatorProps {
     handlePreviousWeek: () => void;

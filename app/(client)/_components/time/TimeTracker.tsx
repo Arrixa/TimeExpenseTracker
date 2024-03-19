@@ -71,9 +71,10 @@ const TimeTracker = ({ allProjects, schedule }) => {
     try {
       const startDateISO = new Date(`${schedule.isoDate}T${startTime}`).toISOString();
       const endDateISO = new Date(`${schedule.isoDate}T${endTime}`).toISOString();
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      console.log('Form submitted:', startDateISO, endDateISO, calculatedHours);
-      const response = await fetch('/api/project', {
+      console.log('Form submitted:', startDateISO, endDateISO, calculatedHours, timeZone);
+      const response = await fetch('/api/time', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -82,13 +83,14 @@ const TimeTracker = ({ allProjects, schedule }) => {
             startTime: startDateISO,
             endTime: endDateISO,
             hours: calculatedHours,
+            timeZone: timeZone,
+            date: schedule.isoDate,
             notes: data.notes,
             projectActivityId: selectedProjectActivityId,
         })
       });
       
       if (response.ok) {
-        console.log(response)
         toast({
           description: "The hours saved successfully.",
         });
