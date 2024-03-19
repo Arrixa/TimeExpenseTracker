@@ -8,7 +8,7 @@ const mainLayout = async ({
 }) => {
 
   return (
-    <div className="flex w-screen">
+    <div className="flex w-full">
       <main className="flex-grow">
         <NavBar />
         <div>

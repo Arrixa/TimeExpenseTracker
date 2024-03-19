@@ -332,8 +332,7 @@ export interface TimeEntry {
   startTime: string;
   endTime: string;
   notes: string;
-  projectId: string;
-  activityId: string;
+  projectActivityId: string;
 }
 
 
@@ -374,6 +373,7 @@ export interface ProjectActivityProps {
   activityName: string;
   chargable: boolean;
   timeReportId: string | null;
+  projectActivityId: string;
 }
 
 export interface ProjectUserProps {

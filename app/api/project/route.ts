@@ -50,7 +50,6 @@ export async function GET(request: Request) {
 
 async function getProjectsData(request: Request) {
   const session = await getServerSession(authOptions);
-  console.log(session, 'session in job post route')
   const clientId = await session?.clientUser.clientId;
   const projects = await prisma.project.findMany({
     where: {

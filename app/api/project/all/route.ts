@@ -39,15 +39,18 @@ async function getClientProject(clientId: string) {
 
     // Simplify and accumulate data
     allActivities.push(...projectActivities.map(pa => ({
-      projectId: project.id,
+      id: pa.id,
+      projectId: project.id, 
       projectName: project.name,
-      ...pa,
+      activityId: pa.activityId,
       activityName: pa.activity.name,
+      chargable: pa.chargable
     })));
 
     allUsers.push(...projectUsers.map(pu => ({
       projectId: project.id,
       projectName: project.name,
+      id: pu.id,
       ...pu,
       userEmail: pu.user.email,
     })));

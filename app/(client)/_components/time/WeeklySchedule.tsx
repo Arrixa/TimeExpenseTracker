@@ -55,10 +55,10 @@ import WeekNavigator from './WeekNavigator';
 const initialSchedule: DaySchedule[] = [];
  
 const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ allProjects }) => {
-    console.log(allProjects, 'PROJECT + ACTIVITY DATA')
     const [schedule, setSchedule] = useState<DaySchedule[]>(initialSchedule);
     const [selectedProjectId, setSelectedProjectId] = useState<string>('');
     const [selectedActivityId, setSelectedActivityId] = useState<string>('');
+    const [selectedProjectActivityId, setSelectedProjectActivityId] = useState<string>('');
     const [filteredActivities, setFilteredActivities] = useState<ProjectActivityProps[]>([]);
     const [currentWeek, setCurrentWeek] = useState<number>(0);
     const [startDate, setStartDate] = useState<string>('');
@@ -170,6 +170,27 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ allProjects }) => {
         }
       }, [selectedProjectId, allProjects.activities]);
 
+    // const projectActivitiesMap = new Map();
+
+    // useEffect(() => {
+    //   allProjects.activities.forEach((activity) => {
+    //     const projectActivities = projectActivitiesMap.get(activity.projectId) || [];
+    //     projectActivities.push(activity);
+    //     projectActivitiesMap.set(activity.projectId, projectActivities);
+    //   });
+    // }, [allProjects.activities]);
+
+    // useEffect(() => {
+    //   if (selectedProjectId) {
+    //     const activities = projectActivitiesMap.get(selectedProjectId) || [];
+    //     setFilteredActivities(activities);
+    //   } else {
+    //     setFilteredActivities([]);
+    //   }
+    // }, [selectedProjectId, projectActivitiesMap]);
+
+
+
       const handleSaveAll = async () => {
         // Transform schedule state to match backend expectations
         const timeEntries: TimeEntry[] = schedule.flatMap(daySchedule => 
@@ -179,8 +200,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ allProjects }) => {
             startTime: hourEntry.startTime,
             endTime: hourEntry.endTime,
             notes: hourEntry.notes,
-            projectId: selectedProjectId, 
-            activityId: selectedActivityId, 
+            projectActivityId: selectedProjectActivityId,
           }))
         );
       
@@ -215,8 +235,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ allProjects }) => {
             startTime: hourEntry.startTime,
             endTime: hourEntry.endTime,
             notes: hourEntry.notes,
-            projectId: selectedProjectId, 
-            activityId: selectedActivityId, 
+            projectActivityId: selectedProjectActivityId, 
         }));
       
         try {
@@ -300,13 +319,13 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ allProjects }) => {
                                         </SelectContent>
                                     </Select>
 
-                                    <Select disabled={!selectedProjectId} onValueChange={setSelectedActivityId}>
+                                    <Select disabled={!selectedProjectId} onValueChange={setSelectedProjectActivityId}>
                                         <SelectTrigger className="w-[150px] border-border mr-2">
                                             <SelectValue placeholder="Select activity" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {filteredActivities.map((activity) => (
-                                            <SelectItem key={activity.id} value={activity.activityId}>{activity.activityName}</SelectItem>
+                                            <SelectItem key={activity.id} value={activity.id}>{activity.activityName}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>

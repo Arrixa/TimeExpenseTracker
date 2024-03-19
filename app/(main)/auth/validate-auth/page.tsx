@@ -13,7 +13,6 @@ import { authOptions } from "@/utils/authOptions";
 
 const ValidatingAuth = async () => {
   const session = await getServerSession(authOptions);
-  console.log(session, "session in validating auth at top");
   const user = session?.user;
   const clientUser = session?.clientUser;
   const role = clientUser?.role;

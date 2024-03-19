@@ -1,253 +1,471 @@
-'use client'
-import { DateSelect } from "@/app/components/common/DateSelect";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form';
-import { Input } from '@/app/components/ui/input';
-import { Button } from '@/app/components/ui/button';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useToast } from "@/app/components/ui/use-toast"
-import { useEffect, useState } from "react";
-import { useSession } from 'next-auth/react';
-import { ProfileFormProps } from '@/lib/interfaces';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form';
+import { useToast } from "@/app/components/ui/use-toast";
+import { DrawerContent, DrawerFooter, DrawerClose } from '@/app/components/ui/drawer';
 import { Label } from '@/app/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { Calendar } from "@/app/components/ui/calendar";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from "@/app/components/ui/select"
+import { Select,  SelectContent,  SelectItem,  SelectTrigger,  SelectValue } from "@/app/components/ui/select";
+import { ProjectActivityProps } from '@/lib/interfaces';
 
 const FormSchema = z.object({
-//   hours: z.string().optional(),
-  date: z.string().optional(),
-  hours: z.number().optional(),
-  start: z.string().min(1, 'Start time is required'),
-  end: z.string().min(1, 'End time is required'),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
   project: z.string().optional(),
   activity: z.string().optional(),
   notes: z.string().optional(),
 });
 
-const TimeTracker = () => {
-    const form = useForm({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-        //   hours: '',
-          start: '',
-          end: '',
-          date: '',
-          project: '',
-          activity: '',
-          notes: '',
+const TimeTracker = ({ allProjects, schedule }) => {
+  const form = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      startTime: '',
+      endTime: '',
+      project: '',
+      activity: '',
+      notes: '',
+    },
+  });
+ 
+  const { toast } = useToast();
+  const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+  const [selectedProjectActivityId, setSelectedProjectActivityId] = useState<string>('');
+  const [filteredActivities, setFilteredActivities] = useState<ProjectActivityProps[]>([]);
+  const [startTime, setStartTime] = useState<string>('08:00');
+  const [endTime, setEndTime] = useState<string>('17:00');
+  const [calculatedHours, setCalculatedHours] = useState<number>(0);
+
+  useEffect(() => {
+    if (selectedProjectId) {
+      const activitiesForProject = allProjects.activities.filter(activity => activity.projectId === selectedProjectId);
+      setFilteredActivities(activitiesForProject);
+    }
+  }, [selectedProjectId, allProjects.activities]);
+
+  useEffect(() => {
+    const hours = calculateHoursWorked(startTime, endTime);
+    setCalculatedHours(hours);
+  }, [startTime, endTime]);
+
+  function calculateHoursWorked(startTime: string, endTime: string) {
+    const start = parseFloat(startTime.replace(':', '.')); 
+    const end = parseFloat(endTime.replace(':', '.')); 
+    let hours = end - start;
+
+    // Ensure hours are within valid range
+    if (hours < 0) {
+        hours += 24; // Adjust for negative hours
+    } else if (hours > 24) {
+        hours = 24; // Cap hours to 24
+    }
+
+    return hours;
+  }
+
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    try {
+      const startDateISO = new Date(`${schedule.isoDate}T${startTime}`).toISOString();
+      const endDateISO = new Date(`${schedule.isoDate}T${endTime}`).toISOString();
+
+      console.log('Form submitted:', startDateISO, endDateISO, calculatedHours);
+      const response = await fetch('/api/project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
+        body: JSON.stringify({
+            startTime: startDateISO,
+            endTime: endDateISO,
+            hours: calculatedHours,
+            notes: data.notes,
+            projectActivityId: selectedProjectActivityId,
+        })
       });
-    
-      const { toast } = useToast();
-      const [date, setDate] = useState<Date>();
-      const [project, setProject] = useState<String>();
-      const [activity, setActivity] = useState<String>();
-      const hours = ''
-      // start + end
-      const [currentWeek, setCurrentWeek] = useState(0);
-      const [startDate, setStartDate] = useState('');
-      const [endDate, setEndDate] = useState('');
-     
-      useEffect(() => {
-        const now = new Date();
-        const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-        const pastDaysOfYear = (now - firstDayOfYear) / 86400000;
-     
-        setCurrentWeek(Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7));
-     
-        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)));
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(endOfWeek.getDate() + 6);
-     
-        setStartDate(startOfWeek.toISOString().split('T')[0]);
-        setEndDate(endOfWeek.toISOString().split('T')[0]);
-      }, []);
+      
+      if (response.ok) {
+        console.log(response)
+        toast({
+          description: "The hours saved successfully.",
+        });
+        // onHoursAdded();
+        // form.reset();
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Saving the hours failed.",
+          description: "Please try again.",
+        });
+        console.error("Save failed");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Saving the hours failed in catch.",
+        description: "Please try again.",
+      });
+    }
+  };
 
-      const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-        try {
-          const response = await fetch('/api/user', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              hours: hours,
-              date: date,
-              project: project,
-              activity: activity,
-              notes: data.notes,
-              email: data.email,
-              status: 'DRAFT'
-            })
-          })
-    
-          console.log('Form submission response:', response);
-          // FTN-2 / FTM-20 7. 
-          if (response.ok) {
-            toast({
-              description: "The user information saved successfully.",
-            })
-            // const res = await response.json();
-            // const responseData = res.updatedInfo;
-            
-          } else {
-            toast({
-              variant: "destructive",
-              title: "Time report failed to save.",
-              description: "Please try again.",
-            })
-            console.error("Save failed");
-          }
-        } catch (error) {
-          toast({
-            variant: "destructive",
-            title: "Time report failed to save.",
-            description: "Please try again.",
-          })
-          console.error("Save failed:", error);
-        }
-      };
-    
   return (
-    <main>
-        <Card className="px-2">
-            <CardHeader>
-                <CardTitle>Week: {currentWeek}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p>{startDate} - {endDate}</p>
-            </CardContent>
-        </Card>
-        <Card className="p-2 flex md:flex-row mt-2">
-            <Form {...form}>
-                <form  onSubmit={form.handleSubmit(onSubmit)} className='w-full px-2'>
-                    <div className="flex flex-row justify-between">
-                        <FormField
-                            control={form.control}
-                            name='start'
-                            render={({ field }) => (
-                            <FormItem className="flex flex-col items-left mt-4 flex-1">
-                                <Label className="mx-4" htmlFor="start">Starting time</Label>
-                                <FormControl className="">
-                                <Input type="text" id="start" placeholder='08:00' 
-                                    {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
+    <DrawerContent>
+      <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
+        <CardHeader className='flex flex-row justify-between'>
+          <div>
+            <CardTitle className='py-2'>{schedule.day}, {schedule.date}</CardTitle>
+            <CardDescription>Add hours worked for specific projects and the corresponding activity</CardDescription>
+          </div>
+          <div>
+            <p>{calculatedHours} h</p>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col md:flex-row mb-4 justify-between">
+                <FormField 
+                  control={form.control}
+                  name='startTime'
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+                      <Label className=" mx-4" htmlFor="start">Start time</Label>
+                      <FormControl className="">
+                        <Input
+                          type='time'
+                          className='mr-2'
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartTime(e.target.value)}
+                          value={startTime}
                         />
-                        <FormField
-                            control={form.control}
-                            name='end'
-                            render={({ field }) => (
-                            <FormItem className="flex flex-col items-left mt-4 flex-1">
-                            <Label htmlFor="end" className="mx-4 ">Ending time</Label>
-                                <FormControl className="">
-                                <Input type="text" id="end" placeholder='17:00' 
-                                    {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField 
+                  control={form.control}
+                  name='endTime'
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+                      <Label className=" mx-4" htmlFor="end">End time</Label>
+                      <FormControl className="">
+                        <Input
+                          className='mr-2'
+                          type='time'
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndTime(e.target.value)}
+                          value={endTime}
                         />
-                        <FormField
-                        control={form.control}
-                        name='project'
-                        render={({ field }) => (
-                            <FormItem className="flex flex-col items-left mt-4 flex-2">
-                                <Label className="w-1/2 ml-4">Project</Label>
-                                <Select 
-                                onValueChange={(value) => {
-                                    field.onChange(value);
-                                    setProject(value);
-                                }}
-                                defaultValue={field.value}>
-                                <FormControl className='w-full'>
-                                    <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select project" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="projectA">Project A</SelectItem>
-                                    <SelectItem value="projectB">Project B</SelectItem>
-                                    <SelectItem value="projectC">Project C</SelectItem>
-                                </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name='activity'
-                        render={({ field }) => (
-                            <FormItem className="flex flex-col items-left mt-4 flex-2">
-                                <Label className="mx-4">Activity</Label>
-                                <Select 
-                                onValueChange={(value) => {
-                                    field.onChange(value);
-                                    setActivity(value);
-                                }}
-                                defaultValue={field.value}>
-                                <FormControl className='w-full'>
-                                    <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select activity" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="activityA">Activity A</SelectItem>
-                                    <SelectItem value="activityB">Activity B</SelectItem>
-                                    <SelectItem value="activityC">Activity C</SelectItem>
-                                </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-
-                    <FormField
-                    control={form.control}
-                    name='notes'
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col items-left mt-4 flex-3">
-                        <Label htmlFor="notes" className="w-1/2 mx-4">Notes</Label>
-                            <FormControl className="">
-                            <Input type="notes" id="notes" placeholder='Enter your notes' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                </div>
-                <div className="flex flex-col-reverse md:flex-row justify-between">
-                    {/* <Button variant='flairnowOutline' className='my-4 text-md' onClick={() => setIsEditMode(false)}>Cancel</Button> */}
-                    <Button className='my-4 text-md' type='submit'>
-                    Submit
-                    </Button>
-                </div>
-                </form>
-            </Form> 
-        </Card>
-        
-    </main>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField 
+                  control={form.control}
+                  name='project'
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+                      <Label className=" mx-4" htmlFor="project">Project</Label>
+                      <FormControl className="">
+                      <Select onValueChange={setSelectedProjectId}>
+                          <SelectTrigger className="w-[150px] border-border mr-2">
+                              <SelectValue placeholder="Select project" />
+                          </SelectTrigger>
+                          <SelectContent>
+                              {allProjects.projects.map((project) => (
+                              <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>
+                              ))}
+                          </SelectContent>
+                      </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField 
+                  control={form.control}
+                  name='activity'
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+                      <Label className=" mx-4" htmlFor="activity">Activity</Label>
+                      <FormControl className="">
+                        <Select disabled={!selectedProjectId} onValueChange={setSelectedProjectActivityId}>
+                          <SelectTrigger className="w-[150px] border-border mr-2">
+                            <SelectValue placeholder="Select activity" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {filteredActivities.map((activity) => (
+                            <SelectItem key={activity.id} value={activity.id}>{activity.activityName}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField 
+                  control={form.control}
+                  name='notes'
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+                      <Label className=" mx-4" htmlFor="notes">Notes</Label>
+                      <FormControl className="">
+                        <Input type="text" id="notes" placeholder='Enter any additional notes' 
+                          {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <DrawerFooter className='flex flex-col md:flex-row justify-between px-2'>
+                <DrawerClose asChild>
+                  <Button variant="flairnowOutline">Cancel</Button>
+                </DrawerClose>
+                <Button variant='flairnow' type='submit'>Save</Button>
+              </DrawerFooter>
+            </form>
+          </Form>             
+        </CardContent>
+      </Card>
+    </DrawerContent>
   )
 }
 
 export default TimeTracker;
 
-        {/* <DateSelect /> */}
-        {/* <Calendar
-            showWeekNumber
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-md border"
-        /> */}
+
+
+// const TimeTracker = ({ allProjects, schedule }) => {
+
+//   const form = useForm({
+//     resolver: zodResolver(FormSchema),
+//     defaultValues: {
+//       startTime: '',
+//       endTime: '',
+//       project: '',
+//       activity: '',
+//       notes: '',
+//     },
+//   });
+ 
+//   const { toast } = useToast();
+
+//   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+//   const [selectedProjectActivityId, setSelectedProjectActivityId] = useState<string>('');
+//   const [filteredActivities, setFilteredActivities] = useState<ProjectActivityProps[]>([]);
+//   // const [selectedActivityId, setSelectedActivityId] = useState<string>('');
+//   const [startTime, setStartTime] = useState<string>('08:00')
+//   const [endTime, setEndTime] = useState<string>('17:00')
+
+//   useEffect(() => {
+//     if (selectedProjectId) {
+//       const activitiesForProject = allProjects.activities.filter(activity => activity.projectId === selectedProjectId);
+//       setFilteredActivities(activitiesForProject);
+//     }
+//   }, [selectedProjectId, allProjects.activities]);
+
+//   function calculateHoursWorked(startTime, endTime) {
+//     const start = parseFloat(startTime.replace(':', '.')); 
+//     const end = parseFloat(endTime.replace(':', '.')); 
+//     let hours = end - start;
+
+//     // Ensure hours are within valid range
+//     if (hours < 0) {
+//         hours += 24; // Adjust for negative hours
+//     } else if (hours > 24) {
+//         hours = 24; // Cap hours to 24
+//     }
+
+//     return hours;
+//   }
+
+//   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+//     console.log('Form submitted:', data, selectedProjectActivityId);
+//     try {
+//       const startDateISO = new Date(`${schedule.isoDate}T${startTime}`).toISOString();
+//       const endDateISO = new Date(`${schedule.isoDate}T${endTime}`).toISOString();
+
+//       const hoursWorked = calculateHoursWorked(startTime, endTime);
+//       console.log('Form submitted:', startDateISO, endDateISO, hoursWorked);
+//       const response = await fetch('/api/time', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             startTime: startDateISO,
+//             endTime: endDateISO,
+//             hours: hoursWorked,
+//             notes: data.notes,
+//             projectActivityId: selectedProjectActivityId,
+//         })
+//       })
+//         if (response.ok) {
+//           console.log(response)
+//           // onActivityAdded();
+//           toast({
+//             description: "The activity saved successfully.",
+//           })
+//           const res = await response.json();
+//           const data = res.ProjectActivity
+//           console.log(res);
+//           // router.push(`/project/${id}`)
+//         } else {
+//           toast({
+//             variant: "destructive",
+//             title: "Saving the hours failed.",
+//             description: "Please try again.",
+//           })
+//           console.error("Save failed");
+//         }
+//     } catch (error) {
+//       toast({
+//         variant: "destructive",
+//         title: "Saving the hours failed in catch.",
+//         description: "Please try again.",
+//       });
+//     }
+//   };
+
+//   return (
+//     <DrawerContent>
+//       <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
+//         <CardHeader className='flex flex-row justify-between'>
+//           <div>
+//             <CardTitle className='py-2'>{schedule.day}, {schedule.date}</CardTitle>
+//             <CardDescription>Add hours worked for specific projects and the corresponding activity</CardDescription>
+//           </div>
+//           <div>
+//             <p>{calculateHoursWorked(startTime, endTime)} h</p>
+//           </div>
+//         </CardHeader>
+//         <CardContent>
+//           <Form {...form}>
+//             <form onSubmit={form.handleSubmit(onSubmit)}>
+//               <div className="flex flex-col md:flex-row mb-4 justify-between">
+//                 <FormField 
+//                   control={form.control}
+//                   name='startTime'
+//                   render={({ field }) => (
+//                     <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+//                       <Label className=" mx-4" htmlFor="start">Start time</Label>
+//                       <FormControl className="">
+//                         <Input
+//                           type='time'
+//                           className='mr-2'
+//                           onChange={(e: any) => setStartTime(e.target.value)}
+//                           // value={schedule[dayIndex].hours[entryIndex].startTime}
+//                           // placeholder='08:00'
+//                           // onChange={(e: any) =>
+//                           //   handleTimeChange(dayIndex, entryIndex, 'startTime', e.target.value, schedule, setSchedule, totalHoursDisplayRef,
+//                           //   setStartTime(e.target.value)
+//                           //   )}
+//                           // {...field}
+//                         />
+//                       </FormControl>
+//                       <FormMessage />
+//                     </FormItem>
+//                   )}
+//                 />
+//                 <FormField 
+//                   control={form.control}
+//                   name='endTime'
+//                   render={({ field }) => (
+//                     <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+//                       <Label className=" mx-4" htmlFor="end">End time</Label>
+//                       <FormControl className="">
+//                       <Input
+//                         className='mr-2'
+//                         type='time'
+//                         onChange={(e: any) => setStartTime(e.target.value)}
+//                         // {...field} 
+//                         // value={schedule[dayIndex].hours[entryIndex].endTime}
+//                         // placeholder='17:00'
+//                         // onChange={(e: any) => handleTimeChange(dayIndex, entryIndex, 'endTime', e.target.value, schedule, setSchedule, totalHoursDisplayRef,
+//                         // // setEndTime(value)
+//                         // )}
+//                       />
+//                       </FormControl>
+//                       <FormMessage />
+//                     </FormItem>
+//                   )}
+//                 />
+//                 <FormField 
+//                   control={form.control}
+//                   name='project'
+//                   render={({ field }) => (
+//                     <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+//                       <Label className=" mx-4" htmlFor="project">Project</Label>
+//                       <FormControl className="">
+//                       <Select onValueChange={setSelectedProjectId}>
+//                           <SelectTrigger className="w-[150px] border-border mr-2">
+//                               <SelectValue placeholder="Select project" />
+//                           </SelectTrigger>
+//                           <SelectContent>
+//                               {allProjects.projects.map((project) => (
+//                               <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>
+//                               ))}
+//                           </SelectContent>
+//                       </Select>
+//                       </FormControl>
+//                       <FormMessage />
+//                     </FormItem>
+//                   )}
+//                 />
+//                 <FormField 
+//                   control={form.control}
+//                   name='activity'
+//                   render={({ field }) => (
+//                     <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+//                       <Label className=" mx-4" htmlFor="activity">Activity</Label>
+//                       <FormControl className="">
+//                         <Select disabled={!selectedProjectId} onValueChange={setSelectedProjectActivityId}>
+//                           <SelectTrigger className="w-[150px] border-border mr-2">
+//                             <SelectValue placeholder="Select activity" />
+//                           </SelectTrigger>
+//                           <SelectContent>
+//                             {filteredActivities.map((activity) => (
+//                             <SelectItem key={activity.id} value={activity.id}>{activity.activityName}</SelectItem>
+//                             ))}
+//                           </SelectContent>
+//                         </Select>
+//                       </FormControl>
+//                       <FormMessage />
+//                     </FormItem>
+//                   )}
+//                 />
+//                 <FormField 
+//                   control={form.control}
+//                   name='notes'
+//                   render={({ field }) => (
+//                     <FormItem className="flex flex-col items-left mt-4 pr-2 flex-1">
+//                       <Label className=" mx-4" htmlFor="notes">Notes</Label>
+//                       <FormControl className="">
+//                         <Input type="text" id="notes" placeholder='Enter any additional notes' 
+//                           {...field} />
+//                       </FormControl>
+//                       <FormMessage />
+//                     </FormItem>
+//                   )}
+//                 />
+//               </div>
+//               <DrawerFooter className='flex flex-col md:flex-row justify-between px-2'>
+//                 <DrawerClose asChild>
+//                   <Button variant="flairnowOutline">Cancel</Button>
+//                 </DrawerClose>
+//                 <Button variant='flairnow' type='submit'>Save</Button>
+//               </DrawerFooter>
+//             </form>
+//           </Form>             
+//         </CardContent>
+//       </Card>
+//     </DrawerContent>
+//   )
+// }
+
+// export default TimeTracker

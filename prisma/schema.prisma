@@ -194,8 +194,8 @@ model TimeReport {
   hours           Int
   notes           String?
   status          Status
-  user            User              @relation(fields: [userId], references: [id])
-  userId          String
+  user            User?              @relation(fields: [userId], references: [id])
+  userId          String?
   approver        ProjectUsers?      @relation(fields: [approverId], references: [id])
   approverId      String?
   ProjectActivity ProjectActivity[]
