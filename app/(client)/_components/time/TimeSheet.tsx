@@ -23,371 +23,190 @@ import TotalHours from './TotalHours';
 import WeekNavigator from './WeekNavigator';
 import TimeTracker from './TimeTracker';
 import { Drawer, DrawerTrigger } from '@/app/components/ui/drawer';
+import { capitaliseFirstLetter } from '@/lib/capitiliseFirstLetter';
+import { Label } from '@/app/components/ui/label';
+import { formatDisplayDate } from '@/lib/time/formatDisplayDate';
+import { formatDisplayTime } from '@/lib/time/formatTimeDisplay';
 
 const initialSchedule: DaySchedule[] = [];
 
 const TimeSheet: React.FC<WeeklyScheduleProps> = ({ allProjects, timeSheetData }) => {
-  const [schedule, setSchedule] = useState<DaySchedule[]>(initialSchedule);
-  const [currentWeek, setCurrentWeek] = useState<number>(0);
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [schedule, setSchedule] = useState([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
+  const getWeekStartAndEnd = (date = new Date()) => {
+    const start = new Date(date.setDate(date.getDate() - date.getDay() + 1)); 
+    const end = new Date(date.setDate(date.getDate() - date.getDay() + 7)); 
+    return { start, end };
+  };
 
-  console.log(timeSheetData, 'fetched times')
-  const totalHoursDisplayRef = useRef<HTMLElement>(null);
+  // Function to handle the current week display.
+  const handleCurrentWeek = () => {
+    const { start, end } = getWeekStartAndEnd(new Date());
+    setStartDate(start.toISOString().split('T')[0]);
+    setEndDate(end.toISOString().split('T')[0]);
+  };
+
+  const getStartAndEndOfWeek = (referenceDate) => {
+    const startOfWeek = new Date(referenceDate);
+    startOfWeek.setHours(0, 0, 0, 0); // start of the day to avoid hour issues
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); // Adjust to your week start (e.g., 1 for Monday)
+  
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Last day of the week
+  
+    return {
+      start: startOfWeek.toISOString().split('T')[0],
+      end: endOfWeek.toISOString().split('T')[0],
+    };
+  };
+  
+  const handlePreviousWeek = () => {
+    const currentStart = new Date(startDate);
+    currentStart.setDate(currentStart.getDate() - 7); // Go back 7 days to get to the previous week
+  
+    const { start, end } = getStartAndEndOfWeek(currentStart);
+    setStartDate(start);
+    setEndDate(end);
+  };
+  
+  const handleNextWeek = () => {
+    const currentEnd = new Date(endDate);
+    currentEnd.setDate(currentEnd.getDate() + 1); // Move to the next day after the end date
+  
+    const { start, end } = getStartAndEndOfWeek(currentEnd);
+    setStartDate(start);
+    setEndDate(end);
+  };
 
   useEffect(() => {
-    const updateSchedule = () => {
-      const now = new Date();
-      const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-      const dayInMilliseconds = 1000 * 60 * 60 * 24;
-      const pastDaysOfYear = Math.floor((now.getTime() - firstDayOfYear.getTime()) / dayInMilliseconds);
-
-      setCurrentWeek(Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7));
-
-      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)));
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(endOfWeek.getDate() + 6);
-
-      setStartDate(startOfWeek.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-      setEndDate(endOfWeek.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-
-      // Filter time sheet data for the current week
-      const filteredData = timeSheetData.filter((entry) => {
-        const entryDate = new Date(entry.startTime);
-        return entryDate >= startOfWeek && entryDate <= endOfWeek;
-      });
-
-      // Generate initial schedule
-      const genSchedule = generateSchedule(startOfWeek, endOfWeek);
-
-      // Update the schedule with filtered data
-      const updatedSchedule = genSchedule.map((daySchedule) => {
-        const dayData = filteredData.filter((entry) => {
-          const entryDate = new Date(entry.startTime);
-          return entryDate.toLocaleDateString('en-CA') === daySchedule.date;
-        });
-        return { ...daySchedule, data: dayData };
-      });
-
-      setSchedule(updatedSchedule);
-    };
-
-    updateSchedule(); // Initial update when component mounts
-
-    // Cleanup function for useEffect
-    return () => {
-      // Any cleanup code if needed
-    };
-  }, [currentWeek, timeSheetData]);
-
-//   useEffect(() => {
-//     const now = new Date();
-//     const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-//     const dayInMilliseconds = 1000 * 60 * 60 * 24;
-//     const pastDaysOfYear = Math.floor((now.getTime() - firstDayOfYear.getTime()) / dayInMilliseconds);
-
-//     setCurrentWeek(Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7));
-
-//     const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)));
-//     const endOfWeek = new Date(startOfWeek);
-//     endOfWeek.setDate(endOfWeek.getDate() + 6);
-
-//     setStartDate(startOfWeek.toLocaleDateString('en-CA', {
-//       year: 'numeric',
-//       month: '2-digit',
-//       day: '2-digit'
-//     }));
-//     setEndDate(endOfWeek.toLocaleDateString('en-CA', {
-//       year: 'numeric',
-//       month: '2-digit',
-//       day: '2-digit'
-//     }));
-
-//     // Generate initial schedule
-//     const genSchedule = generateSchedule(startOfWeek, endOfWeek);
-
-//     // Filter time sheet data for the current week
-//     const filteredData = timeSheetData.filter((entry) => {
-//       const entryDate = new Date(entry.startTime);
-//       return entryDate >= startOfWeek && entryDate <= endOfWeek;
-//     });
-
-//     // Update the schedule with filtered data
-//     const updatedSchedule = genSchedule.map((daySchedule) => {
-//       const dayData = filteredData.filter((entry) => {
-//         const entryDate = new Date(entry.startTime);
-//         return entryDate.toLocaleDateString('en-CA') === daySchedule.date;
-//       });
-//       return { ...daySchedule, data: dayData };
-//     });
-
-//     setSchedule(updatedSchedule);
-// }, [currentWeek, timeSheetData]);
-
-  // useEffect(() => {
-  //     const now = new Date();
-  //     const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-  //     const dayInMilliseconds = 1000 * 60 * 60 * 24;
-  //     const pastDaysOfYear = Math.floor((now.getTime() - firstDayOfYear.getTime()) / dayInMilliseconds);
-
-  //     setCurrentWeek(Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7));
-
-  //     const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)));
-  //     const endOfWeek = new Date(startOfWeek);
-  //     endOfWeek.setDate(endOfWeek.getDate() + 6);
-
-  //     setStartDate(startOfWeek.toLocaleDateString('en-CA', {
-  //     year: 'numeric',
-  //     month: '2-digit',
-  //     day: '2-digit'
-  //     }));
-  //     setEndDate(endOfWeek.toLocaleDateString('en-CA', {
-  //     year: 'numeric',
-  //     month: '2-digit',
-  //     day: '2-digit'
-  //     }));
-
-  //     const genSchedule = generateSchedule(startOfWeek, endOfWeek); // Generate initial schedule
-
-  //     // Filter time sheet data for the current week
-  //     const filteredData = timeSheetData.filter((entry) => {
-  //       const entryDate = new Date(entry.startTime);
-  //       return entryDate >= startOfWeek && entryDate <= endOfWeek;
-  //     });
-
-  //     // Update the schedule with filtered data
-  //     const updatedSchedule = schedule.map((daySchedule) => {
-  //       const dayData = filteredData.filter((entry) => {
-  //         const entryDate = new Date(entry.startTime);
-  //         return entryDate.toLocaleDateString('en-CA') === daySchedule.date;
-  //       });
-  //       return { ...daySchedule, data: dayData };
-  //     });
-
-  //     setSchedule(updatedSchedule);
-  // }, [currentWeek]);
-
-  const handleNextWeek = () => {
-    // setCurrentWeek(currentWeek + 1);
-    // Update start and end dates based on new week
-    const nextWeekStart = new Date(startDate);
-    nextWeekStart.setDate(nextWeekStart.getDate() + 7);
-
-    const nextWeekEnd = new Date(nextWeekStart);
-    nextWeekEnd.setDate(nextWeekEnd.getDate() + 6);
-
-    setStartDate(nextWeekStart.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }));
-    setEndDate(nextWeekEnd.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }));
-
-    generateSchedule(nextWeekStart, nextWeekEnd); // Generate schedule for previous week
-  }
-
-  const handlePreviousWeek = () => {
-  // setCurrentWeek(currentWeek - 1);
-
-  const prevWeekStart = new Date(startDate);
-  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-
-  const prevWeekEnd = new Date(prevWeekStart);
-  prevWeekEnd.setDate(prevWeekEnd.getDate() + 6);
-
-  setStartDate(prevWeekStart.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-  }));
-  setEndDate(prevWeekEnd.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-  }));
-
-  generateSchedule(prevWeekStart, prevWeekEnd); // Generate schedule for previous week
-  };
-
-  const handleCurrentWeek = () => {
     const now = new Date();
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)));
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    now.setHours(0, 0, 0, 0); // Reset hours to start of the day
+    // Find the first day of the week
+    let start = new Date(now);
+    start.setDate(start.getDate() - start.getDay() + 1);
+    // Find the last day of the week
+    let end = new Date(start);
+    end.setDate(start.getDate() + 6);
   
-    setStartDate(startOfWeek.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }));
-    setEndDate(endOfWeek.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }));
-  
-    setCurrentWeek(Math.ceil((now.getTime() - startOfWeek.getTime()) / (1000 * 60 * 60 * 24 * 7))); // Calculate current week number
-    generateSchedule(startOfWeek, endOfWeek); // Generate schedule for current week
-  };
+    setStartDate(start.toISOString().split('T')[0]);
+    setEndDate(end.toISOString().split('T')[0]);
+  }, []);
 
-  console.log(schedule, 'SCHEDULE')
+  useEffect(() => {
+    handleCurrentWeek();
+  }, []);
+
+  useEffect(() => {
+    const updateSchedule = async () => {
+      // const data = await fetchTimeSheetData();
+      const filteredData = timeSheetData.filter(entry => {
+        const entryDate = new Date(entry.startTime).toISOString().split('T')[0];
+        return entryDate >= startDate && entryDate <= endDate;
+      });
+
+      // Generate schedule for each day of the week.
+      const newSchedule = [];
+      for (let day = new Date(startDate); day <= new Date(endDate); day.setDate(day.getDate() + 1)) {
+        const dayStr = day.toISOString().split('T')[0];
+        const dayEntries = filteredData.filter(entry => entry.date === dayStr);
+        
+        newSchedule.push({
+          date: dayStr,
+          entries: dayEntries,
+        });
+      }
+
+      setSchedule(newSchedule);
+    };
+
+    updateSchedule();
+  }, [startDate, endDate]);
+
 
   return (
     <main className='flex flex-col w-full'>
-        <WeekNavigator
-          handlePreviousWeek={handlePreviousWeek}
-          handleNextWeek={handleNextWeek}
-          handleCurrentWeek={handleCurrentWeek}
-          startDate={startDate}
-          endDate={endDate}
-        />
-          {schedule.map((daySchedule, dayIndex) => (
-              <Card key={dayIndex} className="mb-4">
-                  <CardHeader>
-                      <CardTitle>
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-md  font-medium">{daySchedule.day}, {daySchedule.date}</h3>
-                            <span ref={totalHoursDisplayRef} className="text-sm ">{calculateTotalHours(dayIndex, schedule)}&nbsp;h</span>
-                        </div>
-                      </CardTitle>
-                      <CardDescription>
-                        <div className="flex items-center justify-between">
-                          <p>Review your time report.</p>
-                          <Drawer>
-                            <DrawerTrigger asChild className="w-1/2">
-                              <Button variant="flairnowOutline" className="mt-4 w-fit">
-                                Add hours
-                              </Button>
-                            </DrawerTrigger>
-                            <TimeTracker allProjects={allProjects} schedule={daySchedule}  />
-                          </Drawer>
-                        </div>
-                      </CardDescription>
-                  </CardHeader>
-                  <CardContent className=''>
-                    {timeSheetData.map((entry, entryIndex) => {
-                      const entryDate = new Date(entry.startTime).toLocaleDateString('en-CA');
-                      if (entryDate === daySchedule.date) {
-                        return (
-                          <div key={entryIndex} className="mt-2 flex flex-col lg:flex-row">
-                            <div className="flex flex-row mb-2">
-                              <p>{new Date(entry.startTime).toLocaleTimeString()}</p>
-                              <p>{new Date(entry.endTime).toLocaleTimeString()}</p>
-                            </div>
-                            <div className="flex flex-row">
-                              <Button className='' variant={'outline'}>
-                                <MdDelete size={20} color='red' />
-                              </Button>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null; // If entry date doesn't match, return null
-                    })}
-                  </CardContent>
-                  {/* <CardContent className=''>
-                  {daySchedule.data.map((time, index) => (
-                    <div key={index} className="mt-2 flex flex-col lg:flex-row">
-                      <div className="flex flex-row mb-2">
-                        <p>{time.startTime}</p>
-                        <p>{time.endTime}</p>
-                      </div>
-                      <div className="flex flex-row">
-                        <Button className='' variant={'outline'}>
-                          <MdDelete size={20} color='red' />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>  */}
-              </Card>
-          ))}
+      <WeekNavigator
+        handlePreviousWeek={handlePreviousWeek}
+        handleNextWeek={handleNextWeek}
+        handleCurrentWeek={handleCurrentWeek}
+        startDate={startDate}
+        endDate={endDate}
+      />
+      {schedule.map(day => {
+        // Calculate the total hours for the day
+        const totalHoursForDay = day.entries.reduce((totalHours, entry) => totalHours + entry.hours, 0);
+
+        return (
+          <Card key={day.date} className='mt-2'>
+            <CardHeader className="flex flex-row justify-between">
+              <CardTitle>
+                <h3>{formatDisplayDate(day.date)}</h3>
+              </CardTitle>
+              <CardDescription className=''>
+                <Drawer>
+                  <DrawerTrigger asChild className="w-1/2">
+                    <Button variant="flairnowOutline" className="mt-4 w-fit">
+                      Add hours
+                    </Button>
+                  </DrawerTrigger>
+                  <TimeTracker allProjects={allProjects} day={day}/>
+                </Drawer>
+                <span className='px-4'>{totalHoursForDay} h</span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='grid grid-cols-4'>
+              <Label>Start time:</Label>
+              <Label>End time:</Label>
+              <Label>Time zone:</Label>
+              <Label>Status:</Label>
+            </CardContent>
+            <CardContent>
+              {day.entries.length > 0 ? (
+                day.entries.map(entry => (
+                  <div key={entry.id} className='grid grid-cols-4 gap-1'>
+                    <p>{formatDisplayTime(entry.startTime)} </p>
+                    <p>{formatDisplayTime(entry.endTime)}</p>
+                    <p>{entry.timeZone}</p>
+                    <p>{capitaliseFirstLetter(entry.status)}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No entries for this day.</p>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
     </main>
   )
 }
 
 export default TimeSheet;
 
-{/* <CardContent className=''>
-    {daySchedule.hours.map((entry, entryIndex) => (
-        <div key={entryIndex} className="mt-2 flex flex-col lg:flex-row">
-            <div className="flex flex-row mb-2">
-                <Input
-                    type='time'
-                    className='mr-2'
-                    value={schedule[dayIndex].hours[entryIndex].startTime}
-                    placeholder='08:00'
-                    onChange={(e: any) =>
-                      handleTimeChange(dayIndex, entryIndex, 'startTime', e.target.value, schedule, setSchedule, totalHoursDisplayRef,
-                      setStartTime(e.target.value)
-                      )}
-                />
-                <Input
-                    className='mr-2'
-                    type='time'
-                    value={schedule[dayIndex].hours[entryIndex].endTime}
-                    placeholder='17:00'
-                    onChange={(e: any) => handleTimeChange(dayIndex, entryIndex, 'endTime', e.target.value, schedule, setSchedule, totalHoursDisplayRef,
-                    // setEndTime(value)
-                    )}
-                />
-            </div>
-            <div className="flex flex-row mb-2">
-            <Select onValueChange={setSelectedProjectId}>
-                <SelectTrigger className="w-[150px] border-border mr-2">
-                    <SelectValue placeholder="Select project" />
-                </SelectTrigger>
-                <SelectContent>
-                    {allProjects.projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-
-            <Select disabled={!selectedProjectId} onValueChange={setSelectedProjectActivityId}>
-                <SelectTrigger className="w-[150px] border-border mr-2">
-                    <SelectValue placeholder="Select activity" />
-                </SelectTrigger>
-                <SelectContent>
-                    {filteredActivities.map((activity) => (
-                    <SelectItem key={activity.id} value={activity.id}>{activity.activityName}</SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-            </div>
-            <div className="flex flex-row">
-                <div className="flex-1">
-                    <Input className='md:w-96 mr-2'
-                        placeholder="Notes"
-                    />
-                </div>
-                <Button className='' variant={'outline'}
-                    onClick={() => removeHourEntry(dayIndex, entryIndex, schedule, setSchedule, totalHoursDisplayRef)}>
-                    <MdDelete size={20} color='red' />
-                </Button>
-            </div>
-        </div>
-    ))}
-    <div className='flex flex-col md:flex-row justify-between'>
-        <Button
-            variant={'flairnowOutline'}
-            className="mt-2"
-            onClick={() => addHours(dayIndex, schedule, setSchedule)}
-        >
-            <IoAddCircle />&nbsp; Add hours
-        </Button>
-        <Button
-            className="mt-2"
-            variant='flairnow'
-            onClick={() => handleSave(dayIndex)}
-        >
-            Save
-        </Button>
-
-    </div>
-</CardContent> */}
+// {Object.entries(groupedData).map(([date, entries]) => (
+//   <Card key={date} className="mb-4">
+//       <CardHeader>
+//           <CardTitle>
+//               <div className="flex items-center justify-between">
+//                   <h3 className="text-md font-medium">
+//                       {date}
+//                   </h3>
+//                   <span className="text-sm ">
+//                       {entries.reduce((acc, curr) => acc + curr.hours, 0)}&nbsp;h
+//                   </span>
+//               </div>
+//           </CardTitle>
+//           <CardDescription>Enter the detailed time report.</CardDescription>
+//       </CardHeader>
+//       <CardContent>
+//           {entries.map((entry, index) => (
+//               <div key={entry.id} className="mt-2 flex space-x-2">
+//                   <p>Start Time: {new Date(entry.startTime).toLocaleTimeString()}</p>
+//                   <p>End Time: {new Date(entry.endTime).toLocaleTimeString()}</p>
+//               </div>
+//           ))}
+//       </CardContent>
+//   </Card>
+// ))}

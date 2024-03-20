@@ -17,13 +17,15 @@ export async function POST(req: Request) {
         email: userEmail
       }
     })
+
+    console.log('projectID::', projectId)
     const project = await prisma.project.findUnique({
       where: {
         id: projectId
       }
     })
 
-    console.log(project, 'PROJECT DETAILS')
+    console.log(project, 'PROJECT DETAILS', user, "USER")
 
     let createdProjectUser;
 

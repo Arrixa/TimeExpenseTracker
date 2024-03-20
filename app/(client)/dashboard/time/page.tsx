@@ -1,6 +1,7 @@
 import TimeSheet from "../../_components/time/TimeSheet";
 import TimeTracker from "../../_components/time/TimeTracker";
-import WeeklySchedule from "../../_components/time/WeeklySchedule";
+// import WeeklySchedule from "../../_components/time/WeeklySchedule";
+import WeeklySchedule from "../../_components/time/Original";
 
 async function fetchProjectActivities() {
   try {
@@ -40,6 +41,7 @@ const TimePage = async () => {
         <h3 className="text-lg text-left pl-6 lg:px-10 md:px-10 my-4">Submit your weekly hours worked</h3>
         {/* <TimeTracker /> */}
         {/* <WeeklySchedule allProjects={allProjects} /> */}
+        {/* <WeeklySchedule /> */}
         <TimeSheet allProjects={allProjects} timeSheetData={timeSheetData} />
       </main>
     );

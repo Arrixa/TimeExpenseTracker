@@ -17,7 +17,7 @@ export const generateSchedule = (startDate: Date, endDate: Date): DaySchedule[] 
             }),
             isoDate: currentDate.
             toISOString().split('T')[0], // Add the ISO string representation of the date
-            hours: isWeekend ? [] : [{ startTime: '09:00', endTime: '17:00', notes: '', }],
+            data: []
         });
 
         currentDate.setDate(currentDate.getDate() + 1);

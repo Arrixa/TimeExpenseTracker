@@ -38,13 +38,15 @@ const ProjectUsersForm = (id, onUserAdded) => {
       reviewer: false,
     },
   });
+
+  console.log(id.id, 'ID in form')
   
   const { toast } = useToast();
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    console.log('form submit clicked', data, 'start and end date', startDate, endDate, id)
+    console.log('form submit clicked', data, 'start and end date', startDate, endDate, id.id)
     try {
       const response = await fetch('/api/project/users', {
         method: 'POST',
@@ -52,7 +54,7 @@ const ProjectUsersForm = (id, onUserAdded) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          projectId: id.id.id,
+          projectId: id.id,
           userEmail: data.userEmail,
           rate: data.rate,
           rateBy: data.rateBy,

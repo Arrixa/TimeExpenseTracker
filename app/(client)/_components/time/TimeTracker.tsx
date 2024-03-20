@@ -11,6 +11,7 @@ import { DrawerContent, DrawerFooter, DrawerClose } from '@/app/components/ui/dr
 import { Label } from '@/app/components/ui/label';
 import { Select,  SelectContent,  SelectItem,  SelectTrigger,  SelectValue } from "@/app/components/ui/select";
 import { ProjectActivityProps } from '@/lib/interfaces';
+import { formatDisplayDate } from '@/lib/time/formatDisplayDate';
 
 const FormSchema = z.object({
   startTime: z.string().optional(),
@@ -20,7 +21,7 @@ const FormSchema = z.object({
   notes: z.string().optional(),
 });
 
-const TimeTracker = ({ allProjects, schedule }) => {
+const TimeTracker = ({ allProjects, day }) => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -69,8 +70,8 @@ const TimeTracker = ({ allProjects, schedule }) => {
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     try {
-      const startDateISO = new Date(`${schedule.isoDate}T${startTime}`).toISOString();
-      const endDateISO = new Date(`${schedule.isoDate}T${endTime}`).toISOString();
+      const startDateISO = new Date(`${day.date}T${startTime}`).toISOString();
+      const endDateISO = new Date(`${day.date}T${endTime}`).toISOString();
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
       console.log('Form submitted:', startDateISO, endDateISO, calculatedHours, timeZone);
@@ -84,7 +85,7 @@ const TimeTracker = ({ allProjects, schedule }) => {
             endTime: endDateISO,
             hours: calculatedHours,
             timeZone: timeZone,
-            date: schedule.isoDate,
+            date: day.date,
             notes: data.notes,
             projectActivityId: selectedProjectActivityId,
         })
@@ -118,7 +119,7 @@ const TimeTracker = ({ allProjects, schedule }) => {
       <Card className='md:mx-2 my-2 p-2 pt-4 md:p-3 lg:p-5'>
         <CardHeader className='flex flex-row justify-between'>
           <div>
-            <CardTitle className='py-2'>{schedule.day}, {schedule.date}</CardTitle>
+            <CardTitle className='py-2'>{formatDisplayDate(day.date)}</CardTitle>
             <CardDescription>Add hours worked for specific projects and the corresponding activity</CardDescription>
           </div>
           <div>

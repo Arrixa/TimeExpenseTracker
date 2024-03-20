@@ -57,6 +57,6 @@ async function getTimeData(userId: string) {
   const timeReport = await prisma.timeReport.findMany({
     where: { userId: userId },
   });
-
+  console.log('TIME REPORT DATA:', timeReport)
   return timeReport
 }
