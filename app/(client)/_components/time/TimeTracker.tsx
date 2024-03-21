@@ -10,7 +10,7 @@ import { useToast } from "@/app/components/ui/use-toast";
 import { DrawerContent, DrawerFooter, DrawerClose } from '@/app/components/ui/drawer';
 import { Label } from '@/app/components/ui/label';
 import { Select,  SelectContent,  SelectItem,  SelectTrigger,  SelectValue } from "@/app/components/ui/select";
-import { ProjectActivityProps } from '@/lib/interfaces';
+import { ProjectActivityProps, TimeEntry } from '@/lib/interfaces';
 import { formatDisplayDate } from '@/lib/time/formatDisplayDate';
 
 const FormSchema = z.object({
@@ -21,7 +21,7 @@ const FormSchema = z.object({
   notes: z.string().optional(),
 });
 
-const TimeTracker = ({ allProjects, day }) => {
+const TimeTracker = ({ allProjects, day }: TimeEntry) => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {

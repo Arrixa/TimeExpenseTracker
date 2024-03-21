@@ -14,7 +14,7 @@ export const WeekNavigator: React.FC<WeekNavigatorProps> = ({
     schedule
 }) => {
     return (
-        <div className="sticky top-0 flex justify-between items-center mb-4 p-2 space-x-2 border-b border-gray-500 bg-white/90 dark:bg-black/80">
+        <section className="sticky top-11 flex justify-between items-center mb-4 p-2 space-x-2 border-b border-gray-500 bg-white/90 dark:bg-black/80">
             <div className='flex flex-row justify-center items-center'>
                 <Button onClick={handlePreviousWeek} variant="ghost">
                     <IoChevronBack />
@@ -31,7 +31,7 @@ export const WeekNavigator: React.FC<WeekNavigatorProps> = ({
                 <h3 className="text-lg font-medium text-right px-6">Weekly hours: {calculateTotalHoursForWeek(schedule)}&nbsp;h</h3>
 
             </div>
-        </div>
+        </section>
     );
 };
 

@@ -10,6 +10,7 @@ import {
   Timer,
   WalletCards,
   FileBox,
+  CalendarCheck
 } from "lucide-react";
 
 // FTM-2 / FTM-20 21. Sidebar icons
@@ -22,6 +23,8 @@ const IconRenderer = ({ iconName }: { iconName: string }) => {
       return <FileBox className="h-5 w-5 ml-4" />;
     case "Time tracker":
       return <Timer className="h-5 w-5 ml-4" />;
+      case "Time off":
+      return <CalendarCheck className="h-5 w-5 ml-4" />;
     case "Time report":
       return <CalendarClock className="h-5 w-5 ml-4" />;
     case "Expense tracker":

@@ -13,6 +13,12 @@ export enum Role {
   UNASSIGNED = 'UNASSIGNED'
 }
 
+export enum Status {
+  SUBMITTED = 'SUBMITTED',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
+
 export interface Account {
   id: string;
   userId: string;
@@ -318,22 +324,9 @@ export interface TimeEntry {
   notes: string;
   timeZone: string;
   projectActivityId: string;
+  day: DaySchedule;
+  allProjects: allProjectsProps;
 }
-
-export interface DaySchedule {
-  day: string;
-  date: string;
-  isoDate: string;
-  data: TimeEntry[];
-}
-
-export interface WeekNavigatorProps {
-    handlePreviousWeek: () => void;
-    handleNextWeek: () => void;
-    handleCurrentWeek: () => void;
-    startDate: string;
-    endDate: string;
-};
 
 export interface ProjectProps {
   id: string;
@@ -390,6 +383,36 @@ export interface allProjectsProps {
   projects: ProjectProps[];
 }
 
+export interface TimeSheetProps {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  hours: number;
+  timeZone: string;
+  notes: string;
+  status: string;
+  userId: string;
+  approverId: string;
+  comment: string;
+}
+
+export interface DaySchedule {
+  date: string;
+  entries: TimeSheetProps[];
+}
+
 export interface WeeklyScheduleProps {
   allProjects: allProjectsProps;
+  timeSheetData: TimeSheetProps[];
+  day: DaySchedule
 }
+
+export interface WeekNavigatorProps {
+  handlePreviousWeek: () => void;
+  handleNextWeek: () => void;
+  handleCurrentWeek: () => void;
+  startDate: string;
+  endDate: string;
+  schedule: DaySchedule[];
+};

@@ -1,9 +1,7 @@
 'use client'
 import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
 import React, { useEffect, useRef, useState } from 'react';
 import { MdDelete } from "react-icons/md";
-import { IoAddCircle } from "react-icons/io5";
 import {
     Card,
     CardContent,
@@ -12,14 +10,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/app/components/ui/card";
-
 import { DaySchedule, allProjectsProps, WeeklyScheduleProps, ProjectActivityProps, TimeEntry } from '@/lib/interfaces';
-import { generateSchedule } from '@/lib/time/generateSchedule';
-import { calculateTotalHours } from '@/lib/time/calculateTotalHours';
-import { handleTimeChange } from '@/lib/time/handleTimeChange';
-import { addHours } from '@/lib/time/addHours';
-import { removeHourEntry } from '@/lib/time/removeHourEntry';
-import TotalHours from './TotalHours';
 import WeekNavigator from './WeekNavigator';
 import TimeTracker from './TimeTracker';
 import { Drawer, DrawerTrigger } from '@/app/components/ui/drawer';
@@ -28,7 +19,6 @@ import { Label } from '@/app/components/ui/label';
 import { formatDisplayDate } from '@/lib/time/formatDisplayDate';
 import { formatDisplayTime } from '@/lib/time/formatTimeDisplay';
 
-const initialSchedule: DaySchedule[] = [];
 
 const TimeSheet: React.FC<WeeklyScheduleProps> = ({ allProjects, timeSheetData }) => {
   const [schedule, setSchedule] = useState([]);
@@ -48,7 +38,7 @@ const TimeSheet: React.FC<WeeklyScheduleProps> = ({ allProjects, timeSheetData }
     setEndDate(end.toISOString().split('T')[0]);
   };
 
-  const getStartAndEndOfWeek = (referenceDate) => {
+  const getStartAndEndOfWeek = (referenceDate: string) => {
     const startOfWeek = new Date(referenceDate);
     startOfWeek.setHours(0, 0, 0, 0); // start of the day to avoid hour issues
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); // Adjust to your week start (e.g., 1 for Monday)

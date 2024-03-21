@@ -10,12 +10,14 @@ import {
   Timer,
   WalletCards,
   FileBox,
+  CalendarCheck
 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  
 } from "@/app/components/ui/tooltip";
 
 // FTM-2 / FTM-20 21. Sidebar + tool tip icons
@@ -53,6 +55,18 @@ const TooltipIconRenderer = ({ iconName }: { iconName: string }) => {
           </TooltipTrigger>
           <TooltipContent>
             <p>Time tracker</p>
+          </TooltipContent>
+        </Tooltip>
+      );
+
+    case "Time off":
+      return (
+        <Tooltip>
+          <TooltipTrigger className="mx-auto">
+            <CalendarCheck className="h-5 w-5 mx-auto hover:scale-125" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Time off</p>
           </TooltipContent>
         </Tooltip>
       );
