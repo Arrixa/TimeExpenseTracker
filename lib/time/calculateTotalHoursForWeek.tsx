@@ -1,14 +1,13 @@
 import { DaySchedule } from "../interfaces";
 import { calculateTotalHours } from "./calculateTotalHours";
 
-export function calculateTotalHoursForWeek(schedule: DaySchedule[]): number {
+export function calculateTotalHoursForWeek(schedule) {
   let totalHours = 0;
-  if (Array.isArray(schedule)) {
-    schedule.forEach((daySchedule: DaySchedule) => {
-      totalHours += calculateTotalHours(schedule.indexOf(daySchedule), schedule);
+  schedule.forEach(daySchedule => {
+    // Loop through each entry in a day to sum hours
+    daySchedule.entries.forEach(entry => {
+      totalHours += entry.hours;
     });
-  } else {
-    console.error("Expected schedule to be an array, received:", typeof schedule);
-  }
+  });
   return totalHours;
 }

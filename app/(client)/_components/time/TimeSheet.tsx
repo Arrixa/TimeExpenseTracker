@@ -125,6 +125,7 @@ const TimeSheet: React.FC<WeeklyScheduleProps> = ({ allProjects, timeSheetData }
   }, [startDate, endDate]);
 
 
+  console.log('SCHEDULE:', schedule)
   return (
     <main className='flex flex-col w-full'>
       <WeekNavigator
@@ -133,6 +134,7 @@ const TimeSheet: React.FC<WeeklyScheduleProps> = ({ allProjects, timeSheetData }
         handleCurrentWeek={handleCurrentWeek}
         startDate={startDate}
         endDate={endDate}
+        schedule={schedule}
       />
       {schedule.map(day => {
         // Calculate the total hours for the day
